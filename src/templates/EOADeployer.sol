@@ -7,10 +7,12 @@ import {Addresses, Environment, Params, ConfigParser} from "src/utils/ConfigPars
  * @notice Struct for deployment information.
  * @param name The name of the deployed contract.
  * @param deployedTo The address where the contract is deployed.
+ * @param envToUpdate The environment variable to update with the deployed address.
  */
 struct Deployment {
     string name;
     address deployedTo;
+    string envToUpdate;
 }
 
 /**
