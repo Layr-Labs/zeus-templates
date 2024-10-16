@@ -15,7 +15,6 @@ import {ITimelock} from "src/interfaces/ITimelock.sol";
  * @dev Writing a script is done from the perspective of the OpsMultisig.
  */
 abstract contract OpsTimelockBuilder is MultisigBuilder {
-
     using MultisigCallUtils for MultisigCall[];
     using SafeTxUtils for SafeTx;
 
@@ -28,7 +27,11 @@ abstract contract OpsTimelockBuilder is MultisigBuilder {
      * @param params A struct containing environment parameters.
      * @return A MultisigCall array representing the SafeTx object for the Gnosis Safe to process.
      */
-    function _execute(Addresses memory addrs, Environment memory env, Params memory params) internal override returns (MultisigCall[] memory) {
+    function _execute(Addresses memory addrs, Environment memory env, Params memory params)
+        internal
+        override
+        returns (MultisigCall[] memory)
+    {
         // get the queue data
         MultisigCall[] memory calls = queue(addrs, env, params);
 
@@ -37,18 +40,10 @@ abstract contract OpsTimelockBuilder is MultisigBuilder {
 
         // encode executor data for timelock
         bytes memory timelockCalldata = abi.encodeWithSelector(
-            ITimelock.queueTransaction.selector,
-            addrs.executorMultisig,
-            0,
-            "",
-            executorCalldata,
-            type(uint256).max
+            ITimelock.queueTransaction.selector, addrs.executorMultisig, 0, "", executorCalldata, type(uint256).max
         );
 
-        _opsCalls.append(
-            addrs.timelock,
-            timelockCalldata
-        );
+        _opsCalls.append(addrs.timelock, timelockCalldata);
 
         // encode timelock data for ops multisig
         return _opsCalls;
@@ -62,7 +57,11 @@ abstract contract OpsTimelockBuilder is MultisigBuilder {
      * @param timelock The address of the timelock contract.
      * @return A bytes array representing the calldata for the executor to be sent to the Timelock.
      */
-    function makeExecutorCalldata(MultisigCall[] memory calls, address multiSendCallOnly, address timelock) public pure returns (bytes memory) {
+    function makeExecutorCalldata(MultisigCall[] memory calls, address multiSendCallOnly, address timelock)
+        public
+        pure
+        returns (bytes memory)
+    {
         bytes memory data = calls.encodeMultisendTxs();
 
         bytes memory executorCalldata = SafeTx({
@@ -83,5 +82,8 @@ abstract contract OpsTimelockBuilder is MultisigBuilder {
      * @param params A struct containing environment parameters.
      * @return An array of MultisigCall structs representing the operations to queue.
      */
-    function queue(Addresses memory addrs, Environment memory env, Params memory params) public virtual returns (MultisigCall[] memory);
+    function queue(Addresses memory addrs, Environment memory env, Params memory params)
+        public
+        virtual
+        returns (MultisigCall[] memory);
 }

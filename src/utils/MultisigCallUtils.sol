@@ -11,33 +11,21 @@ struct MultisigCall {
 }
 
 library MultisigCallUtils {
-
-    function append(
-        MultisigCall[] storage multisigCalls,
-        address to,
-        uint256 value,
-        bytes memory data
-    ) internal returns (MultisigCall[] storage) {
-        multisigCalls.push(MultisigCall({
-            to: to,
-            value: value,
-            data: data
-        }));
+    function append(MultisigCall[] storage multisigCalls, address to, uint256 value, bytes memory data)
+        internal
+        returns (MultisigCall[] storage)
+    {
+        multisigCalls.push(MultisigCall({to: to, value: value, data: data}));
 
         return multisigCalls;
     }
 
     /// @notice appends a multisig call with a value of 0
-    function append(
-        MultisigCall[] storage multisigCalls,
-        address to,
-        bytes memory data
-    ) internal returns (MultisigCall[] storage) {
-        multisigCalls.push(MultisigCall({
-            to: to,
-            value: 0,
-            data: data
-        }));
+    function append(MultisigCall[] storage multisigCalls, address to, bytes memory data)
+        internal
+        returns (MultisigCall[] storage)
+    {
+        multisigCalls.push(MultisigCall({to: to, value: 0, data: data}));
 
         return multisigCalls;
     }
@@ -46,14 +34,7 @@ library MultisigCallUtils {
         bytes memory ret = new bytes(0);
         for (uint256 i = 0; i < txs.length; i++) {
             ret = abi.encodePacked(
-                ret,
-                abi.encodePacked(
-                    uint8(0),
-                    txs[i].to,
-                    txs[i].value,
-                    uint256(txs[i].data.length),
-                    txs[i].data
-                )
+                ret, abi.encodePacked(uint8(0), txs[i].to, txs[i].value, uint256(txs[i].data.length), txs[i].data)
             );
         }
 

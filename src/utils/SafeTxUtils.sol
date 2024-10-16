@@ -13,15 +13,12 @@ struct SafeTx {
 }
 
 library SafeTxUtils {
-    function encodeForExecutor(
-        SafeTx memory t,
-        address timelock
-    ) public pure returns (bytes memory) {
+    function encodeForExecutor(SafeTx memory t, address timelock) public pure returns (bytes memory) {
         // TODO: validate the correctness of this sig
         bytes1 v = bytes1(uint8(1));
         bytes32 r = bytes32(uint256(uint160(timelock)));
         bytes32 s;
-        bytes memory sig = abi.encodePacked(r,s,v);
+        bytes memory sig = abi.encodePacked(r, s, v);
 
         bytes memory executorCalldata = abi.encodeWithSelector(
             ISafe.execTransaction.selector,

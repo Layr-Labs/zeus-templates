@@ -10,7 +10,6 @@ import {SafeTx, EncGnosisSafe} from "src/utils/SafeTxUtils.sol";
  * @dev Abstract contract for building arbitrary multisig scripts.
  */
 abstract contract MultisigBuilder is ConfigParser {
-
     using MultisigCallUtils for MultisigCall[];
 
     /**
@@ -25,11 +24,7 @@ abstract contract MultisigBuilder is ConfigParser {
      */
     function execute(string memory envPath) public returns (SafeTx memory) {
         // read in config file for relevant environment
-        (
-            Addresses memory addrs,
-            Environment memory env,
-            Params memory params
-        ) = _readConfigFile(envPath);
+        (Addresses memory addrs, Environment memory env, Params memory params) = _readConfigFile(envPath);
 
         // get calls for Multisig from inheriting script
         MultisigCall[] memory calls = _execute(addrs, env, params);
@@ -39,12 +34,7 @@ abstract contract MultisigBuilder is ConfigParser {
 
         // creates and return SafeTx object
         // assumes 0 value (ETH) being sent to multisig
-        return SafeTx({
-            to: params.multiSendCallOnly,
-            value: 0,
-            data: data,
-            op: EncGnosisSafe.Operation.DelegateCall
-        });
+        return SafeTx({to: params.multiSendCallOnly, value: 0, data: data, op: EncGnosisSafe.Operation.DelegateCall});
     }
 
     /**
@@ -54,5 +44,8 @@ abstract contract MultisigBuilder is ConfigParser {
      * @param params A struct containing the parameters for the multisig call.
      * @return An array of MultisigCall objects.
      */
-    function _execute(Addresses memory addrs, Environment memory env, Params memory params) internal virtual returns (MultisigCall[] memory);
+    function _execute(Addresses memory addrs, Environment memory env, Params memory params)
+        internal
+        virtual
+        returns (MultisigCall[] memory);
 }

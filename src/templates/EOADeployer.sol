@@ -31,11 +31,7 @@ abstract contract EOADeployer is ConfigParser {
      */
     function deploy(string memory envPath) public returns (Deployment[] memory) {
         // read in config file for environment
-        (
-            Addresses memory addrs,
-            Environment memory env,
-            Params memory params
-        ) = _readConfigFile(envPath);
+        (Addresses memory addrs, Environment memory env, Params memory params) = _readConfigFile(envPath);
 
         // return deployment info
         return _deploy(addrs, env, params);
@@ -48,5 +44,8 @@ abstract contract EOADeployer is ConfigParser {
      * @param params Struct containing additional parameters for deployment.
      * @return An array of Deployment structs representing the deployed contracts.
      */
-    function _deploy(Addresses memory addrs, Environment memory env, Params memory params) internal virtual returns (Deployment[] memory);
+    function _deploy(Addresses memory addrs, Environment memory env, Params memory params)
+        internal
+        virtual
+        returns (Deployment[] memory);
 }

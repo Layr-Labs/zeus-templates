@@ -4,50 +4,45 @@ pragma solidity ^0.8.12;
 import {ISafe} from "src/interfaces/ISafe.sol";
 
 library EncGnosisSafe {
-
     enum Operation {
         Call,
         DelegateCall
     }
 
-    uint constant SAFE_TX_GAS = 0;
-    uint constant BASE_GAS = 0;
-    uint constant GAS_PRICE = 0;
+    uint256 constant SAFE_TX_GAS = 0;
+    uint256 constant BASE_GAS = 0;
+    uint256 constant GAS_PRICE = 0;
     address constant GAS_TOKEN = address(uint160(0));
     address constant REFUND_RECEIVER = payable(address(uint160(0)));
 
-    function execTransaction(
-        address from,
-        address to,
-        bytes memory data,
-        Operation op
-    ) internal pure returns (bytes memory) {
+    function execTransaction(address from, address to, bytes memory data, Operation op)
+        internal
+        pure
+        returns (bytes memory)
+    {
         return encodeForExecutor(from, to, 0, data, op);
     }
 
-    function execTransaction(
-        address from,
-        address to,
-        uint value,
-        bytes memory data,
-        Operation op
-    ) internal pure returns (bytes memory) {
+    function execTransaction(address from, address to, uint256 value, bytes memory data, Operation op)
+        internal
+        pure
+        returns (bytes memory)
+    {
         return encodeForExecutor(from, to, value, data, op);
     }
 
-    function encodeForExecutor(
-        address from,
-        address to,
-        uint value,
-        bytes memory data,
-        Operation op
-    ) internal pure returns (bytes memory) {
+    function encodeForExecutor(address from, address to, uint256 value, bytes memory data, Operation op)
+        internal
+        pure
+        returns (bytes memory)
+    {
         bytes1 v = bytes1(uint8(1));
         bytes32 r = bytes32(uint256(uint160(from)));
         bytes32 s;
-        bytes memory sig = abi.encodePacked(r,s,v);
+        bytes memory sig = abi.encodePacked(r, s, v);
 
-        bytes memory final_calldata_to_executor_multisig = abi.encodeWithSelector(ISafe.execTransaction.selector,
+        bytes memory final_calldata_to_executor_multisig = abi.encodeWithSelector(
+            ISafe.execTransaction.selector,
             to,
             value,
             data,

@@ -7,7 +7,7 @@ import "forge-std/Test.sol";
 import "./StringUtils.sol";
 
 struct Environment {
-    uint chainid;
+    uint256 chainid;
     string name;
     string lastUpdated;
 }
@@ -78,13 +78,15 @@ struct Addresses {
 }
 
 contract ConfigParser is Script, Test {
-
     using StringUtils for *;
 
     string private _configPath;
     string private _configData;
 
-    function _readConfigFile(string memory configPath) internal returns (Addresses memory, Environment memory, Params memory) {
+    function _readConfigFile(string memory configPath)
+        internal
+        returns (Addresses memory, Environment memory, Params memory)
+    {
         _configPath = configPath;
         _configData = vm.readFile(_configPath);
         emit log_named_string("Reading from config file", _configPath);
@@ -96,13 +98,11 @@ contract ConfigParser is Script, Test {
         return (addrs, env, params);
     }
 
-
     /**
      *
      *                            READS
      *
      */
-
     function _readEnvironment() private view returns (Environment memory) {
         return Environment({
             chainid: _readUint(".config.environment.chainid"),
@@ -180,12 +180,8 @@ contract ConfigParser is Script, Test {
 
         TUPInfo[] memory strategyInfos = new TUPInfo[](strategyProxies.length);
 
-        for (uint i = 0; i < strategyInfos.length; i++) {
-            strategyInfos[i] = TUPInfo({
-                proxy: strategyProxies[i],
-                impl: strategyImpl,
-                pendingImpl: address(0)
-            });
+        for (uint256 i = 0; i < strategyInfos.length; i++) {
+            strategyInfos[i] = TUPInfo({proxy: strategyProxies[i], impl: strategyImpl, pendingImpl: address(0)});
         }
 
         return strategyInfos;
@@ -204,7 +200,7 @@ contract ConfigParser is Script, Test {
         return stdJson.readAddress(_configData, jsonLocation);
     }
 
-    function _readUint(string memory jsonLocation) private view returns (uint) {
+    function _readUint(string memory jsonLocation) private view returns (uint256) {
         return stdJson.readUint(_configData, jsonLocation);
     }
 
