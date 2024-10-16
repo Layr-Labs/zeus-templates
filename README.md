@@ -1,66 +1,30 @@
-## Foundry
+## Zeus Templates
 
-**Foundry is a blazing fast, portable and modular toolkit for Ethereum application development written in Rust.**
-
-Foundry consists of:
-
--   **Forge**: Ethereum testing framework (like Truffle, Hardhat and DappTools).
--   **Cast**: Swiss army knife for interacting with EVM smart contracts, sending transactions and getting chain data.
--   **Anvil**: Local Ethereum node, akin to Ganache, Hardhat Network.
--   **Chisel**: Fast, utilitarian, and verbose solidity REPL.
-
-## Documentation
-
-https://book.getfoundry.sh/
+This repo sets up template contracts for [Zeus](https://github.com/Layr-Labs/zeus), the staged web3 deployer + metadata management CLI.
 
 ## Usage
 
-### Build
+The `templates` directory contains all relevant abstract contracts for scripts to inherit.
+
+An example import is `import {EOADeployer} from "zeus-templates/templates/EOADeployer.sol";`
+
+### EOADeployer
+
+A generic script with a `deploy(string memory)` entry function for setting up any number of consecutive deploys.
+
+### MultisigBuilder
+
+A generic script with an `execute(string memory)` entry function for setting up any number of arbitrary calls from a multisig. Uses the `MultiSendCallOnly` contract for batching multiple calls into one transaction.
+
+### OpsTimelockBuilder
+
+A specialized script for the Operations Multisig, allowing for calls to be written for queueing into the Timelock before being sent to the Executor Multisig. See [the multisig governance documentation](https://docs.eigenlayer.xyz/eigenlayer/security/multisig-governance) for more details on EigenLayer's onchain role structure.
+
+## Install via Foundry
 
 ```shell
-$ forge build
+forge install Layr-labs/zeus-templates
 ```
 
-### Test
+Run `forge install` inside a relevant repo that Zeus is using as a $ZEUS_CONTRACTS repo (e.g. [eigenlayer-contracts](https://github.com/Layr-Labs/eigenlayer-contracts)).
 
-```shell
-$ forge test
-```
-
-### Format
-
-```shell
-$ forge fmt
-```
-
-### Gas Snapshots
-
-```shell
-$ forge snapshot
-```
-
-### Anvil
-
-```shell
-$ anvil
-```
-
-### Deploy
-
-```shell
-$ forge script script/Counter.s.sol:CounterScript --rpc-url <your_rpc_url> --private-key <your_private_key>
-```
-
-### Cast
-
-```shell
-$ cast <subcommand>
-```
-
-### Help
-
-```shell
-$ forge --help
-$ anvil --help
-$ cast --help
-```
