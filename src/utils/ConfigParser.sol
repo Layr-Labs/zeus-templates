@@ -103,7 +103,7 @@ contract ConfigParser is Script, Test {
      *                            READS
      *
      */
-    function _readEnvironment() private view returns (Environment memory) {
+    function _readEnvironment() private returns (Environment memory) {
         return Environment({
             chainid: _readUint(".config.environment.chainid"),
             name: _readString(".config.environment.name"),
@@ -111,7 +111,7 @@ contract ConfigParser is Script, Test {
         });
     }
 
-    function _readParams() private view returns (Params memory) {
+    function _readParams() private returns (Params memory) {
         return Params({
             multiSendCallOnly: _readAddress(".config.params.multiSendCallOnly"),
             ethPOS: _readAddress(".config.params.ethPOS"),
@@ -127,7 +127,7 @@ contract ConfigParser is Script, Test {
         });
     }
 
-    function _readAddresses() private view returns (Addresses memory) {
+    function _readAddresses() private returns (Addresses memory) {
         return Addresses({
             // Admin
             communityMultisig: _readAddress(".deployment.admin.communityMultisig"),
@@ -158,7 +158,7 @@ contract ConfigParser is Script, Test {
         });
     }
 
-    function _readTUP(string memory jsonLocation) private view returns (TUPInfo memory) {
+    function _readTUP(string memory jsonLocation) private returns (TUPInfo memory) {
         return TUPInfo({
             proxy: _readAddress(jsonLocation.concat(".proxy")),
             impl: _readAddress(jsonLocation.concat(".impl")),
@@ -166,7 +166,7 @@ contract ConfigParser is Script, Test {
         });
     }
 
-    function _readBeacon(string memory jsonLocation) private view returns (BeaconInfo memory) {
+    function _readBeacon(string memory jsonLocation) private returns (BeaconInfo memory) {
         return BeaconInfo({
             beacon: _readAddress(jsonLocation.concat(".beacon")),
             impl: _readAddress(jsonLocation.concat(".impl")),
@@ -174,7 +174,7 @@ contract ConfigParser is Script, Test {
         });
     }
 
-    function _readStrategies(string memory jsonLocation) private view returns (TUPInfo[] memory) {
+    function _readStrategies(string memory jsonLocation) private returns (TUPInfo[] memory) {
         address[] memory strategyProxies = stdJson.readAddressArray(_configData, jsonLocation.concat(".addrs"));
         address strategyImpl = _readAddress(jsonLocation.concat(".impl"));
 
@@ -187,7 +187,7 @@ contract ConfigParser is Script, Test {
         return strategyInfos;
     }
 
-    function _readToken(string memory jsonLocation) private view returns (TokenInfo memory) {
+    function _readToken(string memory jsonLocation) private returns (TokenInfo memory) {
         return TokenInfo({
             proxy: _readAddress(jsonLocation.concat(".proxy")),
             impl: _readAddress(jsonLocation.concat(".impl")),
@@ -196,15 +196,15 @@ contract ConfigParser is Script, Test {
         });
     }
 
-    function _readAddress(string memory jsonLocation) private view returns (address) {
+    function _readAddress(string memory jsonLocation) private returns (address) {
         return stdJson.readAddress(_configData, jsonLocation);
     }
 
-    function _readUint(string memory jsonLocation) private view returns (uint256) {
+    function _readUint(string memory jsonLocation) private returns (uint256) {
         return stdJson.readUint(_configData, jsonLocation);
     }
 
-    function _readString(string memory jsonLocation) private view returns (string memory) {
+    function _readString(string memory jsonLocation) private returns (string memory) {
         return stdJson.readString(_configData, jsonLocation);
     }
 }
