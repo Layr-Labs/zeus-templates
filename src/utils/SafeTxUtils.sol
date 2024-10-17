@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: BUSL-1.1
 pragma solidity ^0.8.12;
 
-import {ISafe, EncGnosisSafe} from "src/utils/EncGnosisSafe.sol";
+import {ISafe, EncGnosisSafe} from "../utils/EncGnosisSafe.sol";
 
 /// @notice SafeTx data struct
 /// @dev based on <https://docs.safe.global/sdk/api-kit/guides/propose-and-confirm-transactions#propose-a-transaction-to-the-service>

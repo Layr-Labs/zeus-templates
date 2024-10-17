@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: BUSL-1.1
 pragma solidity ^0.8.12;
 
-import {Addresses, Environment, Params, ConfigParser} from "src/utils/ConfigParser.sol";
+import {Addresses, Environment, Params, ConfigParser} from "../utils/ConfigParser.sol";
 
 /**
  * @notice Struct for deployment information.

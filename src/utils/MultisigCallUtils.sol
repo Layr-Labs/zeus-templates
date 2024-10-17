@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: BUSL-1.1
 pragma solidity ^0.8.12;
 
-import {ISafe} from "src/interfaces/ISafe.sol";
-import {IMultiSend} from "src/interfaces/IMultiSend.sol";
+import {ISafe} from "../interfaces/ISafe.sol";
+import {IMultiSend} from "../interfaces/IMultiSend.sol";
 
 struct MultisigCall {
     address to;

@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: BUSL-1.1
 pragma solidity ^0.8.12;
 
-import {Addresses, Environment, Params, ConfigParser} from "src/utils/ConfigParser.sol";
-import {MultisigCall, MultisigCallUtils} from "src/utils/MultisigCallUtils.sol";
-import {SafeTx, SafeTxUtils, EncGnosisSafe} from "src/utils/SafeTxUtils.sol";
+import {Addresses, Environment, Params, ConfigParser} from "../utils/ConfigParser.sol";
+import {MultisigCall, MultisigCallUtils} from "../utils/MultisigCallUtils.sol";
+import {SafeTx, SafeTxUtils, EncGnosisSafe} from "../utils/SafeTxUtils.sol";
 
 import {MultisigBuilder} from "./MultisigBuilder.sol";
 
-import {ITimelock} from "src/interfaces/ITimelock.sol";
+import {ITimelock} from "../interfaces/ITimelock.sol";
 
 /**
  * @title OpsTimelockBuilder
