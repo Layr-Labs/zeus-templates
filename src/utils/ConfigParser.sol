@@ -2,7 +2,7 @@
 pragma solidity ^0.8.12;
 
 import "forge-std/Script.sol";
-import "forge-std/Test.sol";
+import "forge-std/StdAssertions.sol";
 
 import "./StringUtils.sol";
 
@@ -77,7 +77,7 @@ struct Addresses {
     TUPInfo eigenStrategy;
 }
 
-contract ConfigParser is Script, Test {
+contract ConfigParser is Script, StdAssertions {
     using StringUtils for *;
 
     string private _configPath;
