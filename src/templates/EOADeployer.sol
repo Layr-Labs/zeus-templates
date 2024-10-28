@@ -4,27 +4,21 @@ pragma solidity ^0.8.12;
 import {Addresses, Environment, Params, ConfigParser} from "../utils/ConfigParser.sol";
 
 /**
- * @notice Struct for deployment information.
- * @param name The name of the deployed contract.
- * @param deployedTo The address where the contract is deployed.
- * @param envToUpdate The environment variable to update with the deployed address.
- */
-struct Deployment {
-    string name;
-    address deployedTo;
-    string envToUpdate;
-}
-
-/**
  * @title EOADeployer
  * @notice Template for an Externally Owned Account (EOA) deploy script.
  */
 abstract contract EOADeployer is ConfigParser {
     /**
-     * @dev Internal array to store deployment information.
-     * Intended to be populated by inheriting contracts.
+     * @notice Struct for deployment information.
+     * @param deployedTo The address where the contract is deployed.
+     * @param override The overridden name of the deployed contract. Leave empty for Zeus to use the default contract name. Otherwise, Zeus will override it if specified.
+     * @param singleton True to have Zeus track this contract within the config. Use for contracts with meaningful identity (e.g. _the_ EigenPodManager implementation).
      */
-    Deployment[] internal _deployments;
+    struct Deployment {
+        address deployedTo;
+        string overrideName;
+        bool singleton;
+    }
 
     /**
      * @notice Deploys contracts based on the configuration specified in the provided environment file.
