@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: BUSL-1.1
 pragma solidity ^0.8.12;
 
-import {Addresses, Environment, Params, ConfigParser} from "../utils/ConfigParser.sol";
 import {MultisigCall, MultisigCallUtils} from "../utils/MultisigCallUtils.sol";
 import {SafeTx, SafeTxUtils, EncGnosisSafe} from "../utils/SafeTxUtils.sol";
 
@@ -22,28 +21,27 @@ abstract contract OpsTimelockBuilder is MultisigBuilder {
 
     /**
      * @notice Overrides the parent _execute() function to call queue() and prepare transactions for the Timelock.
-     * @param addrs A struct containing environment addresses.
-     * @param env A struct containing environment configuration values.
-     * @param params A struct containing environment parameters.
      * @return A MultisigCall array representing the SafeTx object for the Gnosis Safe to process.
      */
-    function _execute(Addresses memory addrs, Environment memory env, Params memory params)
-        internal
-        override
-        returns (MultisigCall[] memory)
-    {
+    function _execute() internal override returns (MultisigCall[] memory) {
         // get the queue data
-        MultisigCall[] memory calls = queue(addrs, env, params);
+        MultisigCall[] memory calls = queue();
+
+        address multiSendCallOnly = vm.envAddress("ZEUS_DEPLOYED_MultiSendCallOnly");
+
+        address timelock = vm.envAddress("ZEUS_DEPLOYED_Timelock");
 
         // encode calls for executor
-        bytes memory executorCalldata = makeExecutorCalldata(calls, params.multiSendCallOnly, addrs.timelock);
+        bytes memory executorCalldata = makeExecutorCalldata(calls, multiSendCallOnly, timelock);
+
+        address executorMultisig = vm.envAddress("ZEUS_DEPLOYED_ExecutorMultisig");
 
         // encode executor data for timelock
         bytes memory timelockCalldata = abi.encodeWithSelector(
-            ITimelock.queueTransaction.selector, addrs.executorMultisig, 0, "", executorCalldata, type(uint256).max
+            ITimelock.queueTransaction.selector, executorMultisig, 0, "", executorCalldata, type(uint256).max
         );
 
-        _opsCalls.append(addrs.timelock, timelockCalldata);
+        _opsCalls.append(timelock, timelockCalldata);
 
         // encode timelock data for ops multisig
         return _opsCalls;
@@ -77,13 +75,7 @@ abstract contract OpsTimelockBuilder is MultisigBuilder {
     /**
      * @notice Queues a set of operations to be executed later.
      * @dev This abstract function is to be overridden by the inheriting contract, where calls are written from the POV of the Executor Multisig.
-     * @param addrs A struct containing environment addresses.
-     * @param env A struct containing environment configuration values.
-     * @param params A struct containing environment parameters.
      * @return An array of MultisigCall structs representing the operations to queue.
      */
-    function queue(Addresses memory addrs, Environment memory env, Params memory params)
-        public
-        virtual
-        returns (MultisigCall[] memory);
+    function queue() public virtual returns (MultisigCall[] memory);
 }

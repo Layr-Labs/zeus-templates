@@ -2,9 +2,6 @@
 pragma solidity ^0.8.12;
 
 import {
-    Addresses,
-    Environment,
-    Params,
     MultisigCall,
     MultisigCallUtils,
     OpsTimelockBuilder
@@ -15,11 +12,7 @@ contract Queue is OpsTimelockBuilder {
 
     MultisigCall[] internal _executorCalls;
 
-    function queue(Addresses memory addrs, Environment memory env, Params memory params)
-        public
-        override
-        returns (MultisigCall[] memory)
-    {
+    function queue() public override returns (MultisigCall[] memory) {
         //////////////////////////
         // construct executor data here
         //////////////////////////

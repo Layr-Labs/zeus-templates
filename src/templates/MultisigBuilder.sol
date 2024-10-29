@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: BUSL-1.1
 pragma solidity ^0.8.12;
 
-import {Addresses, Environment, Params, ConfigParser} from "../utils/ConfigParser.sol";
+import {Script} from "forge-std/Script.sol";
 import {MultisigCall, MultisigCallUtils} from "../utils/MultisigCallUtils.sol";
 import {SafeTx, EncGnosisSafe} from "../utils/SafeTxUtils.sol";
 
@@ -9,43 +9,30 @@ import {SafeTx, EncGnosisSafe} from "../utils/SafeTxUtils.sol";
  * @title MultisigBuilder
  * @dev Abstract contract for building arbitrary multisig scripts.
  */
-abstract contract MultisigBuilder is ConfigParser {
+abstract contract MultisigBuilder is Script {
     using MultisigCallUtils for MultisigCall[];
 
     /**
-     * @dev To be used in _execute() to craft multisig calls.
-     */
-    MultisigCall[] internal _multisigCalls;
-
-    /**
      * @notice Constructs a SafeTx object for a Gnosis Safe to ingest.
-     * @param envPath The path to the relevant environment configuration file.
      * @return A SafeTx struct containing the transaction data to post to the Safe API.
      */
-    function execute(string memory envPath) public returns (SafeTx memory) {
-        // read in config file for relevant environment
-        (Addresses memory addrs, Environment memory env, Params memory params) = _readConfigFile(envPath);
-
+    function execute() public returns (SafeTx memory) {
         // get calls for Multisig from inheriting script
-        MultisigCall[] memory calls = _execute(addrs, env, params);
+        MultisigCall[] memory calls = _execute();
 
         // encode calls as MultiSend data
         bytes memory data = calls.encodeMultisendTxs();
 
         // creates and return SafeTx object
         // assumes 0 value (ETH) being sent to multisig
-        return SafeTx({to: params.multiSendCallOnly, value: 0, data: data, op: EncGnosisSafe.Operation.DelegateCall});
+
+        address multiSendCallOnly = vm.envAddress("ZEUS_DEPLOYED_MultiSendCallOnly");
+        return SafeTx({to: multiSendCallOnly, value: 0, data: data, op: EncGnosisSafe.Operation.DelegateCall});
     }
 
     /**
      * @notice To be implemented by inheriting contract.
-     * @param addrs A struct containing the addresses involved in the multisig call.
-     * @param env A struct containing the environment settings for the multisig call.
-     * @param params A struct containing the parameters for the multisig call.
      * @return An array of MultisigCall objects.
      */
-    function _execute(Addresses memory addrs, Environment memory env, Params memory params)
-        internal
-        virtual
-        returns (MultisigCall[] memory);
+    function _execute() internal virtual returns (MultisigCall[] memory);
 }
