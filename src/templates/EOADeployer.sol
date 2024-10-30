@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: BUSL-1.1
 pragma solidity ^0.8.12;
 
-import {Script} from "forge-std/Script.sol";
+import {ZeusScript} from "../utils/ZeusScript.sol";
 
 /**
  * @title EOADeployer
  * @notice Template for an Externally Owned Account (EOA) deploy script.
  */
-abstract contract EOADeployer is Script {
+abstract contract EOADeployer is ZeusScript {
     /**
      * @notice Struct for deployment information.
      * @param deployedTo The address where the contract is deployed.
