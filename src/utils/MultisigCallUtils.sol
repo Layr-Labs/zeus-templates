@@ -40,4 +40,17 @@ library MultisigCallUtils {
 
         return abi.encodeWithSelector(IMultiSend.multiSend.selector, ret);
     }
+
+    function makeExecutorCalldata(MultisigCall[] memory calls, address multiSendCallOnly, address timelock)
+        internal
+        pure
+        returns (bytes memory)
+    {
+        return abi.encodeWithSelector(
+            IMultiSend.multiSend.selector,
+            encodeMultisendTxs(calls),
+            multiSendCallOnly,
+            timelock
+        );
+    }
 }
