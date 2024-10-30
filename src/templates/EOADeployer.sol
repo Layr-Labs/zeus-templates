@@ -34,4 +34,28 @@ abstract contract EOADeployer is ZeusScript {
      * @return An array of Deployment structs representing the deployed contracts.
      */
     function _deploy() internal virtual returns (Deployment[] memory);
+
+    function singleton(address deployedTo) internal pure returns (Deployment memory) {
+        return Deployment({
+            deployedTo: deployedTo,
+            overrideName: "",
+            singleton: true
+        });
+    }
+
+    function instance(address deployedTo) internal pure returns (Deployment memory) {
+        return Deployment({
+            deployedTo: deployedTo,
+            overrideName: "",
+            singleton: false
+        });
+    }
+
+    function named(address deployedTo, string memory overrideName) internal pure returns (Deployment memory) {
+        return Deployment({
+            deployedTo: deployedTo,
+            overrideName: overrideName,
+            singleton: true
+        });
+    }
 }
