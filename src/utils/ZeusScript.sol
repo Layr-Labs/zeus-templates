@@ -30,7 +30,7 @@ contract ZeusScript is Script {
     //////////////////////////
 
     function ethPOS() internal view returns (address) {
-        return vm.envAddress("ethPOS");
+        return zeusAddress("ethPOS");
     }
 
     function EigenpodGenesisTime() internal view returns (uint64) {
