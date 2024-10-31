@@ -34,12 +34,51 @@ abstract contract ZeusScript is Script {
     /// HELPER FUNCTIONS /////
     //////////////////////////
 
-    function ethPOS() internal view returns (address) {
+    function _ethPos() internal view returns (address) {
         return zeusAddress("ethPOS");
     }
 
-    function EigenpodGenesisTime() internal view returns (uint64) {
+    function _eigenpodGenesisTime() internal view returns (uint64) {
         return getUint64("EIGENPOD_GENESIS_TIME");
     }
 
+    function _eigenPodManagerPendingImpl() internal view returns (address) {
+        return zeusAddress("EigenPodManager_pendingImpl");
+    }
+
+    function _operationsMultisig() internal view returns (address) {
+        return zeusAddress("OperationsMultisig");
+    }
+
+    function _pauserRegistry() internal view returns (address) {
+        return zeusAddress("PauserRegistry");
+    }
+
+    function _proxyAdmin() internal view returns (address) {
+        return zeusAddress("ProxyAdmin");
+    }
+
+    function _eigenPodManagerProxy() internal view returns (address) {
+        return zeusAddress("EigenPodManager_proxy");
+    }
+
+    function _eigenPodBeacon() internal view returns (address) {
+        return zeusAddress("EigenPod_beacon");
+    }
+
+    function _eigenPodPendingImpl() internal view returns (address) {
+        return zeusAddress("EigenPod_pendingImpl");
+    }
+
+    function _multiSendCallOnly() internal view returns (address) {
+        return zeusAddress("MultiSendCallOnly");
+    }
+
+    function _timelock() internal view returns (address) {
+        return zeusAddress("Timelock");
+    }
+
+    function _executorMultisig() internal view returns (address) {
+        return zeusAddress("ExecutorMultisig");
+    }
 }
