@@ -8,6 +8,7 @@ contract ZeusScript is Script {
     using StringUtils for string;
 
     string internal constant addressPrefix = "ZEUS_DEPLOYED_";
+    string internal constant envPrefix = "ZEUS_ENV_";
 
     /**
      * @notice Returns the address of a contract based on the provided key, querying the envvars injected by Zeus. This is typically the name of the contract.
@@ -18,4 +19,22 @@ contract ZeusScript is Script {
         string memory envvar = addressPrefix.concat(key);
         return vm.envAddress(envvar);
     }
+
+    function getUint64(string memory key) internal view returns (uint64) {
+        string memory envvar = envPrefix.concat(key);
+        return uint64(vm.envUint(envvar));
+    }
+
+    //////////////////////////
+    /// HELPER FUNCTIONS /////
+    //////////////////////////
+
+    function ethPOS() internal view returns (address) {
+        return vm.envAddress("ethPOS");
+    }
+
+    function EigenpodGenesisTime() internal view returns (uint64) {
+        return getUint64("EIGENPOD_GENESIS_TIME");
+    }
+
 }
