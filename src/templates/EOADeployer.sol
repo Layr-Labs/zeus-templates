@@ -11,12 +11,12 @@ abstract contract EOADeployer is ZeusScript {
     /**
      * @notice Struct for deployment information.
      * @param deployedTo The address where the contract is deployed.
-     * @param override The overridden name of the deployed contract. Leave empty for Zeus to use the default contract name. Otherwise, Zeus will override it if specified.
+     * @param name The name of the deployed contract.
      * @param singleton True to have Zeus track this contract within the config. Use for contracts with meaningful identity (e.g. _the_ EigenPodManager implementation).
      */
     struct Deployment {
         address deployedTo;
-        string overrideName;
+        string name;
         bool singleton;
     }
 
@@ -35,27 +35,19 @@ abstract contract EOADeployer is ZeusScript {
      */
     function _deploy() internal virtual returns (Deployment[] memory);
 
-    function singleton(address deployedTo) internal pure returns (Deployment memory) {
+    function singleton(address deployedTo, string memory name) internal pure returns (Deployment memory) {
         return Deployment({
             deployedTo: deployedTo,
-            overrideName: "",
+            name: name,
             singleton: true
         });
     }
 
-    function instance(address deployedTo) internal pure returns (Deployment memory) {
+    function instance(address deployedTo, string memory name) internal pure returns (Deployment memory) {
         return Deployment({
             deployedTo: deployedTo,
-            overrideName: "",
+            name: name,
             singleton: false
-        });
-    }
-
-    function named(address deployedTo, string memory overrideName) internal pure returns (Deployment memory) {
-        return Deployment({
-            deployedTo: deployedTo,
-            overrideName: overrideName,
-            singleton: true
         });
     }
 }
