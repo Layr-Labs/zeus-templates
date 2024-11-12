@@ -7,13 +7,13 @@ import {Script} from "forge-std/Script.sol";
 abstract contract ZeusScript is Script {
     using StringUtils for string;
 
-    enum EnvironmentVariableType{ INT_256, ADDRESS, STRING }
+    enum EnvironmentVariableType {
+        INT_256,
+        ADDRESS,
+        STRING
+    }
 
-    event ZeusEnvironmentUpdate(
-        string key,
-        EnvironmentVariableType internalType,
-        bytes value
-    );
+    event ZeusEnvironmentUpdate(string key, EnvironmentVariableType internalType, bytes value);
 
     string internal constant addressPrefix = "ZEUS_DEPLOYED_";
     string internal constant envPrefix = "ZEUS_ENV_";
@@ -23,8 +23,9 @@ abstract contract ZeusScript is Script {
      */
     function zeusTest() public virtual;
 
-
-    /**** Environment manipulation - update variables in the current environment's configuration ******/
+    /**
+     * Environment manipulation - update variables in the current environment's configuration *****
+     */
     // NOTE: you do not need to use these for contract addresses, which are tracked and injected automatically.
     // NOTE: do not use `.update()` during a vm.broadcast() segment.
     function update(string memory key, string memory value) {
@@ -38,7 +39,9 @@ abstract contract ZeusScript is Script {
     function update(string memory key, uint256 memory value) {
         emit ZeusEnvironmentUpdate(key, EnvironmentVariableType.INT_256, abi.encode(value));
     }
-    /************************************/
+    /**
+     *
+     */
 
     /**
      * @notice Returns the address of a contract based on the provided key, querying the envvars injected by Zeus. This is typically the name of the contract.
