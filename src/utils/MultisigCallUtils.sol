@@ -47,10 +47,7 @@ library MultisigCallUtils {
         returns (bytes memory)
     {
         return abi.encodeWithSelector(
-            IMultiSend.multiSend.selector,
-            encodeMultisendTxs(calls),
-            multiSendCallOnly,
-            timelock
+            IMultiSend.multiSend.selector, encodeMultisendTxs(calls), multiSendCallOnly, timelock
         );
     }
 }

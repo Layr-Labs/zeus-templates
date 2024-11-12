@@ -36,18 +36,10 @@ abstract contract EOADeployer is ZeusScript {
     function _deploy() internal virtual returns (Deployment[] memory);
 
     function singleton(address deployedTo, string memory name) internal pure returns (Deployment memory) {
-        return Deployment({
-            deployedTo: deployedTo,
-            name: name,
-            singleton: true
-        });
+        return Deployment({deployedTo: deployedTo, name: name, singleton: true});
     }
 
     function instance(address deployedTo, string memory name) internal pure returns (Deployment memory) {
-        return Deployment({
-            deployedTo: deployedTo,
-            name: name,
-            singleton: false
-        });
+        return Deployment({deployedTo: deployedTo, name: name, singleton: false});
     }
 }
