@@ -28,17 +28,18 @@ abstract contract ZeusScript is Script {
      */
     // NOTE: you do not need to use these for contract addresses, which are tracked and injected automatically.
     // NOTE: do not use `.update()` during a vm.broadcast() segment.
-    function update(string memory key, string memory value) {
+    function update(string memory key, string memory value) public {
         emit ZeusEnvironmentUpdate(key, EnvironmentVariableType.STRING, abi.encode(value));
     }
 
-    function update(string memory key, address memory value) {
+    function update(string memory key, address value) public {
         emit ZeusEnvironmentUpdate(key, EnvironmentVariableType.ADDRESS, abi.encode(value));
     }
 
-    function update(string memory key, uint256 memory value) {
+    function update(string memory key, uint256 value) public {
         emit ZeusEnvironmentUpdate(key, EnvironmentVariableType.INT_256, abi.encode(value));
     }
+
     /**
      *
      */
