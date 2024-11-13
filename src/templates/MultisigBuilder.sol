@@ -28,7 +28,7 @@ abstract contract MultisigBuilder is ZeusScript {
         // creates and return SafeTx object
         // assumes 0 value (ETH) being sent to multisig
 
-        address multiSendCallOnly = zeusAddress(multiSendCallOnlyName);
+        address multiSendCallOnly = zAddress(multiSendCallOnlyName);
 
         return SafeTx({to: multiSendCallOnly, value: 0, data: data, op: EncGnosisSafe.Operation.DelegateCall});
     }
