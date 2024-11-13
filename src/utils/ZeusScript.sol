@@ -63,7 +63,7 @@ abstract contract ZeusScript is Script {
         return value;
     }
 
-    function zUpdate(string memory key, uint256 value) public returns (uint256) {
+    function zUpdateUint256(string memory key, uint256 value) public returns (uint256) {
         require(
             updatedTypes[key] == EnvironmentVariableType.UNMODIFIED
                 || updatedTypes[key] == EnvironmentVariableType.UINT_256
@@ -74,7 +74,7 @@ abstract contract ZeusScript is Script {
         return value;
     }
 
-    function zUpdate(string memory key, uint64 value) public returns (uint64) {
+    function zUpdateUint64(string memory key, uint64 value) public returns (uint64) {
         require(
             updatedTypes[key] == EnvironmentVariableType.UNMODIFIED
                 || updatedTypes[key] == EnvironmentVariableType.UINT_64
@@ -85,7 +85,7 @@ abstract contract ZeusScript is Script {
         return value;
     }
 
-    function zUpdate(string memory key, uint32 value) public returns (uint32) {
+    function zUpdateUint32(string memory key, uint32 value) public returns (uint32) {
         require(
             updatedTypes[key] == EnvironmentVariableType.UNMODIFIED
                 || updatedTypes[key] == EnvironmentVariableType.UINT_32
