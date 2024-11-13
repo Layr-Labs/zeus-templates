@@ -45,10 +45,18 @@ abstract contract ZeusScript is Script {
      * @param key The key to look up the address for. Should be the contract name, with an optional suffix if deploying multiple instances. (E.g. "MyContract_1" and "MyContract_2")
      * @return The address of the contract associated with the provided key. Reverts if envvar not found.
      */
-    function zAddress(string memory key) internal view returns (address) {
+    function zDeployedContract(string memory key) internal view returns (address) {
         //                     ZEUS_DEPLOYED_ + key
         string memory envvar = addressPrefix.concat(key);
         return vm.envAddress(envvar);
+    }
+
+    /**
+     * Returns an `address` set in the current environment. NOTE: If you deployed this contract with zeus, you want `zDeployedContract` instead.
+     * @param key The environment key. Corresponds to a ZEUS_* env variable.
+     */
+    function zAddress(string memory key) internal view returns (address) {
+        return vm.envAddress(key);
     }
 
     /**
