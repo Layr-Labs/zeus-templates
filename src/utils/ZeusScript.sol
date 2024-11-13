@@ -45,7 +45,7 @@ abstract contract ZeusScript is Script {
      * @param key The key to look up the address for. Should be the contract name, with an optional suffix if deploying multiple instances. (E.g. "MyContract_1" and "MyContract_2")
      * @return The address of the contract associated with the provided key. Reverts if envvar not found.
      */
-    function zDeployedContract(string memory key) internal view returns (address) {
+    function zDeployedContract(string memory key) public view returns (address) {
         //                     ZEUS_DEPLOYED_ + key
         string memory envvar = addressPrefix.concat(key);
         return vm.envAddress(envvar);
@@ -55,7 +55,7 @@ abstract contract ZeusScript is Script {
      * Returns an `address` set in the current environment. NOTE: If you deployed this contract with zeus, you want `zDeployedContract` instead.
      * @param key The environment key. Corresponds to a ZEUS_* env variable.
      */
-    function zAddress(string memory key) internal view returns (address) {
+    function zAddress(string memory key) public view returns (address) {
         return vm.envAddress(key);
     }
 
@@ -63,7 +63,7 @@ abstract contract ZeusScript is Script {
      * Returns a uin64 set in the current environment.
      * @param key The environment key. Corresponds to a ZEUS_* env variable.
      */
-    function zUint64(string memory key) internal view returns (uint64) {
+    function zUint64(string memory key) public view returns (uint64) {
         string memory envvar = envPrefix.concat(key);
         return uint64(vm.envUint(envvar));
     }
@@ -72,7 +72,7 @@ abstract contract ZeusScript is Script {
      * Returns a boolean set in the current environment.
      * @param key The environment key. Corresponds to a ZEUS_* env variable.
      */
-    function zBool(string memory key) internal view returns (bool) {
+    function zBool(string memory key) public view returns (bool) {
         string memory envvar = envPrefix.concat(key);
         return bool(vm.envBool(envvar));
     }
@@ -81,7 +81,7 @@ abstract contract ZeusScript is Script {
      * Returns a string set in the current environment
      * @param key The environment key. Corresponds to a ZEUS_* env variable.
      */
-    function zString(string memory key) internal view returns (string memory) {
+    function zString(string memory key) public view returns (string memory) {
         string memory envvar = envPrefix.concat(key);
         return vm.envString(envvar);
     }
