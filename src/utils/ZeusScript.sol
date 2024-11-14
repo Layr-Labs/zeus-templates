@@ -127,7 +127,8 @@ abstract contract ZeusScript is Script {
             return updatedAddresses[key];
         }
 
-        return vm.envAddress(key);
+        string memory envvar = envPrefix.concat(key);
+        return vm.envAddress(envvar);
     }
 
     /**
