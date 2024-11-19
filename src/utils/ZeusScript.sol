@@ -129,6 +129,19 @@ abstract contract ZeusScript is Script {
         return vm.envAddress(envvar);
     }
 
+    function zDeployedProxy(string memory key) public view returns (address) {
+        //                     ZEUS_DEPLOYED_ + key_Proxy
+        string memory envvar = addressPrefix.concat(this.proxy(key));
+        return vm.envAddress(envvar);
+    }
+
+    function zDeployedImpl(string memory key) public view returns (address) {
+        //                     ZEUS_DEPLOYED_ + key_Impl
+        string memory envvar = addressPrefix.concat(this.impl(key));
+        return vm.envAddress(envvar);
+    }
+
+
     /**
      * Returns an `address` set in the current environment. NOTE: If you deployed this contract with zeus, you want `zDeployedContract` instead.
      * @param key The environment key. Corresponds to a ZEUS_* env variable.
