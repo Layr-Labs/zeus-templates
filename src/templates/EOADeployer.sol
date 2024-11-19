@@ -8,6 +8,9 @@ import {ZeusScript} from "../utils/ZeusScript.sol";
  * @notice Template for an Externally Owned Account (EOA) deploy script.
  */
 abstract contract EOADeployer is ZeusScript {
+
+    Deployment[] private _deployments;
+
     /**
      * @notice Struct for deployment information.
      * @param deployedTo The address where the contract is deployed.
@@ -36,9 +39,15 @@ abstract contract EOADeployer is ZeusScript {
 
     function deploySingleton(address deployedTo, string memory name) internal {
         emit ZeusDeploy(name, deployedTo, true /* singleton */ );
+        _deployments.push(Deployment(deployedTo, name, true));
     }
 
     function deployInstance(address deployedTo, string memory name) internal {
         emit ZeusDeploy(name, deployedTo, false /* singleton */ );
+        _deployments.push(Deployment(deployedTo, name, true));
+    }
+
+    function deploys() public view returns (Deployment[] memory) {
+        return _deployments;
     }
 }
