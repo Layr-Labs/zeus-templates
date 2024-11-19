@@ -3,6 +3,7 @@ pragma solidity ^0.8.12;
 
 import {StringUtils} from "./StringUtils.sol";
 import {Script} from "forge-std/Script.sol";
+import {EncGnosisSafe} from "./EncGnosisSafe.sol";
 
 abstract contract ZeusScript is Script {
     using StringUtils for string;
@@ -18,6 +19,8 @@ abstract contract ZeusScript is Script {
     }
 
     event ZeusEnvironmentUpdate(string key, EnvironmentVariableType internalType, bytes value);
+    event ZeusDeploy(string name, address addr, bool singleton);
+    event ZeusMultisigExecute(address to, uint256 value, bytes data, EncGnosisSafe.Operation op);
 
     string internal constant addressPrefix = "ZEUS_DEPLOYED_";
     string internal constant envPrefix = "ZEUS_ENV_";
@@ -140,7 +143,6 @@ abstract contract ZeusScript is Script {
         string memory envvar = addressPrefix.concat(this.impl(key));
         return vm.envAddress(envvar);
     }
-
 
     /**
      * Returns an `address` set in the current environment. NOTE: If you deployed this contract with zeus, you want `zDeployedContract` instead.

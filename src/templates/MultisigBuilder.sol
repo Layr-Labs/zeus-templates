@@ -15,10 +15,9 @@ abstract contract MultisigBuilder is ZeusScript {
     string internal constant multiSendCallOnlyName = "MultiSendCallOnly";
 
     /**
-     * @notice Constructs a SafeTx object for a Gnosis Safe to ingest.
-     * @return A SafeTx struct containing the transaction data to post to the Safe API.
+     * @notice Constructs a SafeTx object for a Gnosis Safe to ingest. Emits via `ZeusMultisigExecute`
      */
-    function execute() public returns (SafeTx memory) {
+    function execute() public {
         // get calls for Multisig from inheriting script
         MultisigCall[] memory calls = _execute();
 
@@ -30,7 +29,7 @@ abstract contract MultisigBuilder is ZeusScript {
 
         address multiSendCallOnly = zAddress(multiSendCallOnlyName);
 
-        return SafeTx({to: multiSendCallOnly, value: 0, data: data, op: EncGnosisSafe.Operation.DelegateCall});
+        emit ZeusMultisigExecute(multiSendCallOnly, 0, data, EncGnosisSafe.Operation.DelegateCall);
     }
 
     /**

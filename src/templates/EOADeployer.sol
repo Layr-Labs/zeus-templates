@@ -22,24 +22,23 @@ abstract contract EOADeployer is ZeusScript {
 
     /**
      * @notice Deploys contracts based on the configuration specified in the provided environment file.
-     * @return An array of Deployment structs containing information about the deployed contracts.
+     * Emits via ZeusDeploy event.
      */
-    function deploy() public returns (Deployment[] memory) {
+    function deploy() public {
         // return deployment info
-        return _deploy();
+        _deploy();
     }
 
     /**
      * @dev Internal function to deploy contracts based on the provided addresses, environment, and parameters.
-     * @return An array of Deployment structs representing the deployed contracts.
      */
-    function _deploy() internal virtual returns (Deployment[] memory);
+    function _deploy() internal virtual;
 
-    function singleton(address deployedTo, string memory name) internal pure returns (Deployment memory) {
-        return Deployment({deployedTo: deployedTo, name: name, singleton: true});
+    function singleton(address deployedTo, string memory name) internal {
+        emit ZeusDeploy(name, deployedTo, true /* singleton */ );
     }
 
-    function instance(address deployedTo, string memory name) internal pure returns (Deployment memory) {
-        return Deployment({deployedTo: deployedTo, name: name, singleton: false});
+    function instance(address deployedTo, string memory name) internal {
+        emit ZeusDeploy(name, deployedTo, false /* singleton */ );
     }
 }
