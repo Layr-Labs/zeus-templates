@@ -22,6 +22,9 @@ abstract contract ZeusScript is Script {
     string internal constant addressPrefix = "ZEUS_DEPLOYED_";
     string internal constant envPrefix = "ZEUS_ENV_";
 
+    string internal constant implSuffix = "_Impl";
+    string internal constant proxySuffix = "_Proxy";
+
     /**
      * @notice A test function to be implemented by the inheriting contract.
      */
@@ -34,6 +37,14 @@ abstract contract ZeusScript is Script {
     mapping(string => uint64) updatedUInt64s;
     mapping(string => uint32) updatedUInt32s;
     mapping(string => bool) updatedBools;
+
+    function impl(string memory contractName) public pure returns (string memory) {
+        return contractName.concat(implSuffix);
+    }
+
+    function proxy(string memory contractName) public pure returns (string memory) {
+        return contractName.concat(proxySuffix);
+    }
 
     /**
      * Environment manipulation - update variables in the current environment's configuration *****
