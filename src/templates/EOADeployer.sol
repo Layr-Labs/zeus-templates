@@ -34,11 +34,11 @@ abstract contract EOADeployer is ZeusScript {
      */
     function _deploy() internal virtual;
 
-    function singleton(address deployedTo, string memory name) internal {
+    function deploySingleton(address deployedTo, string memory name) internal {
         emit ZeusDeploy(name, deployedTo, true /* singleton */ );
     }
 
-    function instance(address deployedTo, string memory name) internal {
+    function deployInstance(address deployedTo, string memory name) internal {
         emit ZeusDeploy(name, deployedTo, false /* singleton */ );
     }
 }
