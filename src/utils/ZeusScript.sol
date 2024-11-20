@@ -4,8 +4,9 @@ pragma solidity ^0.8.12;
 import {StringUtils} from "./StringUtils.sol";
 import {Script} from "forge-std/Script.sol";
 import {EncGnosisSafe} from "./EncGnosisSafe.sol";
+import {Test} from "forge-std/Test.sol";
 
-abstract contract ZeusScript is Script {
+abstract contract ZeusScript is Script, Test {
     using StringUtils for string;
 
     enum EnvironmentVariableType {
@@ -27,11 +28,6 @@ abstract contract ZeusScript is Script {
 
     string internal constant implSuffix = "_Impl";
     string internal constant proxySuffix = "_Proxy";
-
-    /**
-     * @notice A test function to be implemented by the inheriting contract.
-     */
-    function zeusTest() public virtual;
 
     mapping(string => address) internal updatedContracts;
     mapping(string => EnvironmentVariableType) updatedTypes;
