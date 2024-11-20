@@ -33,6 +33,7 @@ abstract contract ZeusScript is Script {
      */
     function zeusTest() public virtual;
 
+    mapping(string => address) internal updatedContracts;
     mapping(string => EnvironmentVariableType) updatedTypes;
     mapping(string => string) updatedStrings;
     mapping(string => address) updatedAddresses;
@@ -129,18 +130,27 @@ abstract contract ZeusScript is Script {
     function zDeployedContract(string memory key) public view returns (address) {
         //                     ZEUS_DEPLOYED_ + key
         string memory envvar = addressPrefix.concat(key);
+        if (updatedContracts[envvar] != address(0)) {
+            return updatedContracts[envvar];
+        }
         return vm.envAddress(envvar);
     }
 
     function zDeployedProxy(string memory key) public view returns (address) {
         //                     ZEUS_DEPLOYED_ + key_Proxy
         string memory envvar = addressPrefix.concat(this.proxy(key));
+        if (updatedContracts[envvar] != address(0)) {
+            return updatedContracts[envvar];
+        }
         return vm.envAddress(envvar);
     }
 
     function zDeployedImpl(string memory key) public view returns (address) {
         //                     ZEUS_DEPLOYED_ + key_Impl
         string memory envvar = addressPrefix.concat(this.impl(key));
+        if (updatedContracts[envvar] != address(0)) {
+            return updatedContracts[envvar];
+        }
         return vm.envAddress(envvar);
     }
 
