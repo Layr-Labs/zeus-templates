@@ -19,7 +19,7 @@ abstract contract MultisigBuilder is ZeusScript {
      */
     function execute() public {
         vm.startPrank(zAddress("MULTISIG"));
-        runAsMultisig();
+        _runAsMultisig();
         vm.stopPrank();
     }
 
@@ -29,5 +29,5 @@ abstract contract MultisigBuilder is ZeusScript {
      * This function will be pranked from the perspective of the multisig you choose to run with.
      * DO NOT USE vm.startPrank()/stopPrank() during your implementation.
      */
-    function runAsMultisig() internal virtual;
+    function _runAsMultisig() internal virtual;
 }
