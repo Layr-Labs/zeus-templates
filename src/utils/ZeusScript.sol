@@ -57,8 +57,9 @@ abstract contract ZeusScript is Script, Test {
         updatedAddresses[multisigContext] = addr;
     }
 
-    function getMockedMultisigContext() public view returns (address) {
+    function getMockedMultisigContext() public returns (address) {
         require(updatedAddresses[multisigContext] != address(0));
+        updatedTypes[multisigContext] = EnvironmentVariableType.ADDRESS;
         return updatedAddresses[multisigContext];
     }
 
