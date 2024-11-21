@@ -18,7 +18,7 @@ abstract contract MultisigBuilder is ZeusScript {
      * @notice Constructs a SafeTx object for a Gnosis Safe to ingest. Emits via `ZeusMultisigExecute`
      */
     function execute() public {
-        vm.startPrank(zAddress("MULTISIG"));
+        vm.startPrank(getMultisigContext());
         _runAsMultisig();
         vm.stopPrank();
     }

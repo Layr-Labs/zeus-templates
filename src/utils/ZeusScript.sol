@@ -52,15 +52,13 @@ abstract contract ZeusScript is Script, Test {
         return contractName.concat(proxySuffix);
     }
 
-    function zMockMultisig(address addr) public {
+    function zSetMultisigContext(address addr) public {
         require(vm.envBool("ZEUS_TEST"), "can only use zMockMultisig() during a test.");
-        updatedAddresses[multisigContext] = addr;
+        zUpdate(multisigContext, addr);
     }
 
-    function getMockedMultisigContext() public returns (address) {
-        require(updatedAddresses[multisigContext] != address(0));
-        updatedTypes[multisigContext] = EnvironmentVariableType.ADDRESS;
-        return updatedAddresses[multisigContext];
+    function getMultisigContext() public view returns (address) {
+        return zAddress(multisigContext);
     }
 
     /**
