@@ -31,7 +31,7 @@ abstract contract ZeusScript is Script, Test {
     string internal constant implSuffix = "_Impl";
     string internal constant proxySuffix = "_Proxy";
 
-    string internal constant multisigContext = "_internal_multisigContext";
+    string internal constant multisigContext = "MULTISIG";
 
     mapping(string => address) internal updatedContracts;
     mapping(string => EnvironmentVariableType) updatedTypes;
