@@ -36,6 +36,7 @@ library EncGnosisSafe {
         pure
         returns (bytes memory)
     {
+        // magic value for signature.
         bytes1 v = bytes1(uint8(1));
         bytes32 r = bytes32(uint256(uint160(from)));
         bytes32 s;

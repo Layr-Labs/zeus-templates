@@ -205,6 +205,32 @@ abstract contract ZeusScript is Script, Test {
     }
 
     /**
+     * Returns a uin16 set in the current environment.
+     * @param key The environment key. Corresponds to a ZEUS_* env variable.
+     */
+    function zUint16(string memory key) public view returns (uint16) {
+        if (updatedTypes[key] != EnvironmentVariableType.UNMODIFIED) {
+            return updatedUInt16s[key];
+        }
+
+        string memory envvar = envPrefix.concat(key);
+        return uint16(vm.envUint(envvar));
+    }
+
+    /**
+     * Returns a uin16 set in the current environment.
+     * @param key The environment key. Corresponds to a ZEUS_* env variable.
+     */
+    function zUint8(string memory key) public view returns (uint8) {
+        if (updatedTypes[key] != EnvironmentVariableType.UNMODIFIED) {
+            return updatedUInt8s[key];
+        }
+
+        string memory envvar = envPrefix.concat(key);
+        return uint8(vm.envUint(envvar));
+    }
+
+    /**
      * Returns a uin64 set in the current environment.
      * @param key The environment key. Corresponds to a ZEUS_* env variable.
      */
