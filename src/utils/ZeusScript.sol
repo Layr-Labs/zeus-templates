@@ -17,7 +17,8 @@ abstract contract ZeusScript is Script, Test {
         ADDRESS,
         STRING,
         BOOL,
-        UINT_16
+        UINT_16,
+        UINT_8
     }
 
     event ZeusEnvironmentUpdate(string key, EnvironmentVariableType internalType, bytes value);
@@ -37,7 +38,8 @@ abstract contract ZeusScript is Script, Test {
     mapping(string => uint256) updatedUInt256s;
     mapping(string => uint64) updatedUInt64s;
     mapping(string => uint32) updatedUInt32s;
-    mapping(string => uint32) updatedUInt16s;
+    mapping(string => uint16) updatedUInt16s;
+    mapping(string => uint8) updatedUInt8s;
     mapping(string => bool) updatedBools;
 
     function impl(string memory contractName) public pure returns (string memory) {
@@ -117,6 +119,17 @@ abstract contract ZeusScript is Script, Test {
         updatedTypes[key] = EnvironmentVariableType.UINT_16;
         updatedUInt16s[key] = value;
         emit ZeusEnvironmentUpdate(key, EnvironmentVariableType.UINT_16, abi.encode(value));
+        return value;
+    }
+
+    function zUpdateUint8(string memory key, uint8 value) public returns (uint8) {
+        require(
+            updatedTypes[key] == EnvironmentVariableType.UNMODIFIED
+                || updatedTypes[key] == EnvironmentVariableType.UINT_8
+        );
+        updatedTypes[key] = EnvironmentVariableType.UINT_8;
+        updatedUInt8s[key] = value;
+        emit ZeusEnvironmentUpdate(key, EnvironmentVariableType.UINT_8, abi.encode(value));
         return value;
     }
 
