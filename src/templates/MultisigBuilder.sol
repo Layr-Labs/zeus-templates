@@ -25,7 +25,7 @@ abstract contract MultisigBuilder is ZeusScript {
 
     /**
      * @notice To be implemented by inheriting contract.
-     * 
+     *
      * This function will be pranked from the perspective of the multisig you choose to run with.
      * DO NOT USE vm.startPrank()/stopPrank() during your implementation.
      */
