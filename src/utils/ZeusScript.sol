@@ -53,7 +53,7 @@ abstract contract ZeusScript is Script, Test {
     }
 
     function zMockMultisig(address addr) public {
-        require(zBool("TEST"), "can only use zMockMultisig() during a test.");
+        require(vm.envBool("ZEUS_TEST"), "can only use zMockMultisig() during a test.");
         updatedAddresses[multisigContext] = addr;
     }
 
