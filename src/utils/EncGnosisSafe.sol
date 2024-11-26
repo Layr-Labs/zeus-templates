@@ -15,7 +15,7 @@ library EncGnosisSafe {
     address constant GAS_TOKEN = address(uint160(0));
     address constant REFUND_RECEIVER = payable(address(uint160(0)));
 
-    function execTransaction(address from, address to, bytes memory data, Operation op)
+    function calldataToExecTransaction(address from, address to, bytes memory data, Operation op)
         internal
         pure
         returns (bytes memory)
@@ -23,7 +23,7 @@ library EncGnosisSafe {
         return encodeForExecutor(from, to, 0, data, op);
     }
 
-    function execTransaction(address from, address to, uint256 value, bytes memory data, Operation op)
+    function calldataToExecTransaction(address from, address to, uint256 value, bytes memory data, Operation op)
         internal
         pure
         returns (bytes memory)
