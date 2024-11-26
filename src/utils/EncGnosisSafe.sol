@@ -13,9 +13,9 @@ library EncGnosisSafe {
     uint256 constant BASE_GAS = 0;
     uint256 constant GAS_PRICE = 0;
     address constant GAS_TOKEN = address(uint160(0));
-    address constant REFUND_RECEIVER = payable(address(uint160(0)));
+    address payable constant REFUND_RECEIVER = payable(address(uint160(0)));
 
-    function execTransaction(address from, address to, bytes memory data, Operation op)
+    function calldataToExecTransaction(address from, address to, bytes memory data, Operation op)
         internal
         pure
         returns (bytes memory)
@@ -23,7 +23,7 @@ library EncGnosisSafe {
         return encodeForExecutor(from, to, 0, data, op);
     }
 
-    function execTransaction(address from, address to, uint256 value, bytes memory data, Operation op)
+    function calldataToExecTransaction(address from, address to, uint256 value, bytes memory data, Operation op)
         internal
         pure
         returns (bytes memory)
@@ -41,20 +41,9 @@ library EncGnosisSafe {
         bytes32 s;
         bytes memory sig = abi.encodePacked(r, s, v);
 
-        bytes memory final_calldata_to_executor_multisig = abi.encodeWithSelector(
-            ISafe.execTransaction.selector,
-            to,
-            value,
-            data,
-            op,
-            SAFE_TX_GAS,
-            BASE_GAS,
-            GAS_PRICE,
-            GAS_TOKEN,
-            REFUND_RECEIVER,
-            sig
+        return abi.encodeCall(
+            ISafe.execTransaction,
+            (to, value, data, uint8(op), SAFE_TX_GAS, BASE_GAS, GAS_PRICE, GAS_TOKEN, REFUND_RECEIVER, sig)
         );
-
-        return final_calldata_to_executor_multisig;
     }
 }

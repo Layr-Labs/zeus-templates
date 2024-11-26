@@ -26,15 +26,14 @@ abstract contract EOADeployer is ZeusScript {
      * @notice Deploys contracts based on the configuration specified in the provided environment file.
      * Emits via ZeusDeploy event.
      */
-    function deploy() public {
-        // return deployment info
-        _deploy();
+    function runAsEOA() public {
+        _runAsEOA();
     }
 
     /**
      * @dev Internal function to deploy contracts based on the provided addresses, environment, and parameters.
      */
-    function _deploy() internal virtual;
+    function _runAsEOA() internal virtual;
 
     function deploySingleton(address deployedTo, string memory name) internal {
         emit ZeusDeploy(name, deployedTo, true /* singleton */ );

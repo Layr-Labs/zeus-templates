@@ -5,6 +5,7 @@ import {StringUtils} from "./StringUtils.sol";
 import {Script} from "forge-std/Script.sol";
 import {EncGnosisSafe} from "./EncGnosisSafe.sol";
 import {Test} from "forge-std/Test.sol";
+import {console} from "forge-std/console.sol";
 
 abstract contract ZeusScript is Script, Test {
     using StringUtils for string;
@@ -31,6 +32,8 @@ abstract contract ZeusScript is Script, Test {
     string internal constant implSuffix = "_Impl";
     string internal constant proxySuffix = "_Proxy";
 
+    string internal constant multisigContext = "MULTISIG";
+
     mapping(string => address) internal updatedContracts;
     mapping(string => EnvironmentVariableType) updatedTypes;
     mapping(string => string) updatedStrings;
@@ -48,6 +51,15 @@ abstract contract ZeusScript is Script, Test {
 
     function proxy(string memory contractName) public pure returns (string memory) {
         return contractName.concat(proxySuffix);
+    }
+
+    function zSetMultisigContext(address addr) public {
+        require(vm.envBool("ZEUS_TEST"), "can only use zMockMultisig() during a test.");
+        zUpdate(multisigContext, addr);
+    }
+
+    function getMultisigContext() public view returns (address) {
+        return zAddress(multisigContext);
     }
 
     /**
@@ -205,6 +217,32 @@ abstract contract ZeusScript is Script, Test {
     }
 
     /**
+     * Returns a uin16 set in the current environment.
+     * @param key The environment key. Corresponds to a ZEUS_* env variable.
+     */
+    function zUint16(string memory key) public view returns (uint16) {
+        if (updatedTypes[key] != EnvironmentVariableType.UNMODIFIED) {
+            return updatedUInt16s[key];
+        }
+
+        string memory envvar = envPrefix.concat(key);
+        return uint16(vm.envUint(envvar));
+    }
+
+    /**
+     * Returns a uin16 set in the current environment.
+     * @param key The environment key. Corresponds to a ZEUS_* env variable.
+     */
+    function zUint8(string memory key) public view returns (uint8) {
+        if (updatedTypes[key] != EnvironmentVariableType.UNMODIFIED) {
+            return updatedUInt8s[key];
+        }
+
+        string memory envvar = envPrefix.concat(key);
+        return uint8(vm.envUint(envvar));
+    }
+
+    /**
      * Returns a uin64 set in the current environment.
      * @param key The environment key. Corresponds to a ZEUS_* env variable.
      */
@@ -215,6 +253,19 @@ abstract contract ZeusScript is Script, Test {
 
         string memory envvar = envPrefix.concat(key);
         return uint64(vm.envUint(envvar));
+    }
+
+    /**
+     * Returns a uin64 set in the current environment.
+     * @param key The environment key. Corresponds to a ZEUS_* env variable.
+     */
+    function zUint256(string memory key) public view returns (uint256) {
+        if (updatedTypes[key] != EnvironmentVariableType.UNMODIFIED) {
+            return updatedUInt256s[key];
+        }
+
+        string memory envvar = envPrefix.concat(key);
+        return uint256(vm.envUint(envvar));
     }
 
     /**

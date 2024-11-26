@@ -17,7 +17,7 @@ interface ISafe {
     function execTransaction(
         address to,
         uint256 value,
-        bytes calldata data,
+        bytes memory data,
         uint8 operation,
         uint256 safeTxGas,
         uint256 baseGas,

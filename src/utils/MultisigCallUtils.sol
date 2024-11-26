@@ -30,7 +30,7 @@ library MultisigCallUtils {
         return multisigCalls;
     }
 
-    function encodeMultisendTxs(MultisigCall[] memory txs) public pure returns (bytes memory) {
+    function encodeMultisendTxs(IMultiSend ms, MultisigCall[] memory txs) public pure returns (bytes memory) {
         bytes memory ret = new bytes(0);
         for (uint256 i = 0; i < txs.length; i++) {
             ret = abi.encodePacked(
@@ -38,16 +38,6 @@ library MultisigCallUtils {
             );
         }
 
-        return abi.encodeWithSelector(IMultiSend.multiSend.selector, ret);
-    }
-
-    function makeExecutorCalldata(MultisigCall[] memory calls, address multiSendCallOnly, address timelock)
-        internal
-        pure
-        returns (bytes memory)
-    {
-        return abi.encodeWithSelector(
-            IMultiSend.multiSend.selector, encodeMultisendTxs(calls), multiSendCallOnly, timelock
-        );
+        return abi.encodeCall(ms.multiSend, ret);
     }
 }

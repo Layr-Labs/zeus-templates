@@ -4,11 +4,12 @@ pragma solidity ^0.8.12;
 import {ZeusScript} from "../utils/ZeusScript.sol";
 import {MultisigCall, MultisigCallUtils} from "../utils/MultisigCallUtils.sol";
 import {SafeTx, EncGnosisSafe} from "../utils/SafeTxUtils.sol";
+import {console} from "forge-std/console.sol";
+
 /**
  * @title MultisigBuilder
  * @dev Abstract contract for building arbitrary multisig scripts.
  */
-
 abstract contract MultisigBuilder is ZeusScript {
     using MultisigCallUtils for MultisigCall[];
 
@@ -18,23 +19,17 @@ abstract contract MultisigBuilder is ZeusScript {
      * @notice Constructs a SafeTx object for a Gnosis Safe to ingest. Emits via `ZeusMultisigExecute`
      */
     function execute() public {
-        // get calls for Multisig from inheriting script
-        MultisigCall[] memory calls = _execute();
-
-        // encode calls as MultiSend data
-        bytes memory data = calls.encodeMultisendTxs();
-
-        // creates and return SafeTx object
-        // assumes 0 value (ETH) being sent to multisig
-
-        address multiSendCallOnly = zAddress(multiSendCallOnlyName);
-
-        emit ZeusMultisigExecute(multiSendCallOnly, 0, data, EncGnosisSafe.Operation.DelegateCall);
+        address multisigContext = getMultisigContext();
+        vm.startPrank(multisigContext, multisigContext);
+        _runAsMultisig();
+        vm.stopPrank();
     }
 
     /**
      * @notice To be implemented by inheriting contract.
-     * @return An array of MultisigCall objects.
+     *
+     * This function will be pranked from the perspective of the multisig you choose to run with.
+     * DO NOT USE vm.startPrank()/stopPrank() during your implementation.
      */
-    function _execute() internal virtual returns (MultisigCall[] memory);
+    function _runAsMultisig() internal virtual;
 }
