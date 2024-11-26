@@ -4,11 +4,12 @@ pragma solidity ^0.8.12;
 import {ZeusScript} from "../utils/ZeusScript.sol";
 import {MultisigCall, MultisigCallUtils} from "../utils/MultisigCallUtils.sol";
 import {SafeTx, EncGnosisSafe} from "../utils/SafeTxUtils.sol";
+import {console} from "forge-std/console.sol";
+
 /**
  * @title MultisigBuilder
  * @dev Abstract contract for building arbitrary multisig scripts.
  */
-
 abstract contract MultisigBuilder is ZeusScript {
     using MultisigCallUtils for MultisigCall[];
 
@@ -18,7 +19,10 @@ abstract contract MultisigBuilder is ZeusScript {
      * @notice Constructs a SafeTx object for a Gnosis Safe to ingest. Emits via `ZeusMultisigExecute`
      */
     function execute() public {
-        vm.startPrank(getMultisigContext());
+        address multisigContext = getMultisigContext();
+        vm.startPrank(multisigContext);
+        console.log("- establishing multisig spoof");
+        console.log(multisigContext);
         _runAsMultisig();
         vm.stopPrank();
     }

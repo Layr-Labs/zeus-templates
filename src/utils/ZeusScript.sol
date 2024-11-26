@@ -5,6 +5,7 @@ import {StringUtils} from "./StringUtils.sol";
 import {Script} from "forge-std/Script.sol";
 import {EncGnosisSafe} from "./EncGnosisSafe.sol";
 import {Test} from "forge-std/Test.sol";
+import {console} from "forge-std/console.sol";
 
 abstract contract ZeusScript is Script, Test {
     using StringUtils for string;
@@ -55,6 +56,8 @@ abstract contract ZeusScript is Script, Test {
     function zSetMultisigContext(address addr) public {
         require(vm.envBool("ZEUS_TEST"), "can only use zMockMultisig() during a test.");
         zUpdate(multisigContext, addr);
+        console.log("zeus test - updated multisig context");
+        console.log(addr);
     }
 
     function getMultisigContext() public view returns (address) {
