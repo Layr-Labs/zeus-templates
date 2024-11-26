@@ -21,8 +21,6 @@ abstract contract MultisigBuilder is ZeusScript {
     function execute() public {
         address multisigContext = getMultisigContext();
         vm.startPrank(multisigContext, multisigContext);
-        console.log("- establishing multisig spoof");
-        console.log(multisigContext);
         _runAsMultisig();
         vm.stopPrank();
     }

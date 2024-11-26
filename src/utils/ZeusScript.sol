@@ -56,8 +56,6 @@ abstract contract ZeusScript is Script, Test {
     function zSetMultisigContext(address addr) public {
         require(vm.envBool("ZEUS_TEST"), "can only use zMockMultisig() during a test.");
         zUpdate(multisigContext, addr);
-        console.log("zeus test - updated multisig context");
-        console.log(addr);
     }
 
     function getMultisigContext() public view returns (address) {
