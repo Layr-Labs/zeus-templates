@@ -2,7 +2,6 @@
 pragma solidity ^0.8.12;
 
 interface ITimelock {
-
     function delay() external view returns (uint256);
 
     function queuedTransactions(bytes32) external view returns (bool);
