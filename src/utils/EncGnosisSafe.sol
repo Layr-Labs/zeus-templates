@@ -43,7 +43,18 @@ library EncGnosisSafe {
 
         return abi.encodeCall(
             ISafe.execTransaction,
-            (to, value, data, uint8(op), SAFE_TX_GAS, BASE_GAS, GAS_PRICE, GAS_TOKEN, REFUND_RECEIVER, sig)
+            (
+                to, 
+                value, 
+                data, 
+                uint8(op), 
+                SAFE_TX_GAS, 
+                BASE_GAS, 
+                GAS_PRICE, 
+                GAS_TOKEN, 
+                REFUND_RECEIVER, 
+                sig
+            )
         );
     }
 }
