@@ -43,8 +43,6 @@ abstract contract ZeusScript is Script, Test {
     string internal constant implSuffix = "_Impl";
     string internal constant proxySuffix = "_Proxy";
 
-    string internal constant multisigContext = "MULTISIG";
-
     mapping(string => address) internal updatedContracts;
     mapping(string => EnvironmentVariableType) updatedTypes;
     mapping(string => string) updatedStrings;
@@ -62,15 +60,6 @@ abstract contract ZeusScript is Script, Test {
 
     function proxy(string memory contractName) public pure returns (string memory) {
         return contractName.concat(proxySuffix);
-    }
-
-    function zSetMultisigContext(address addr) public {
-        require(vm.envBool("ZEUS_TEST"), "can only use zMockMultisig() during a test.");
-        zUpdate(multisigContext, addr);
-    }
-
-    function getMultisigContext() public view returns (address) {
-        return zAddress(multisigContext);
     }
 
     /**
