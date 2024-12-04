@@ -10,6 +10,16 @@ import {console} from "forge-std/console.sol";
 abstract contract ZeusScript is Script, Test {
     using StringUtils for string;
 
+    enum Operation {
+        Call,
+        DelegateCall
+    }
+
+    struct MultisigOptions {
+        address addr; // the address of the multisig
+        Operation callType; // call vs. delegateCall
+    }
+
     enum EnvironmentVariableType {
         UNMODIFIED,
         UINT_256,
@@ -22,6 +32,7 @@ abstract contract ZeusScript is Script, Test {
         UINT_8
     }
 
+    event ZeusRequireMultisig(address addr, Operation callType);
     event ZeusEnvironmentUpdate(string key, EnvironmentVariableType internalType, bytes value);
     event ZeusDeploy(string name, address addr, bool singleton);
     event ZeusMultisigExecute(address to, uint256 value, bytes data, EncGnosisSafe.Operation op);
