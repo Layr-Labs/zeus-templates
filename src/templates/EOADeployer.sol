@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: BUSL-1.1
 pragma solidity ^0.8.12;
 
+import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 import {ZeusScript} from "../utils/ZeusScript.sol";
 
 /**
