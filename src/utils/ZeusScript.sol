@@ -158,16 +158,50 @@ abstract contract ZeusScript is Script, Test {
 
     /**
      * @notice Returns the address of a contract based on the provided key, querying the envvars injected by Zeus. This is typically the name of the contract.
-     * @param key The key to look up the address for. Should be the contract name, with an optional suffix if deploying multiple instances. (E.g. "MyContract_1" and "MyContract_2")
+     * @param contractName The key to look up the address for. Should be the contract name, with an optional suffix if deploying multiple instances. (E.g. "MyContract_1" and "MyContract_2")
      * @return The address of the contract associated with the provided key. Reverts if envvar not found.
      */
-    function zDeployedContract(string memory key) public view returns (address) {
+    function zDeployedContract(string memory contractName) public view returns (address) {
         //                     ZEUS_DEPLOYED_ + key
-        string memory envvar = addressPrefix.concat(key);
-        if (updatedContracts[key] != address(0)) {
-            return updatedContracts[key];
+        string memory envvar = addressPrefix.concat(contractName);
+        if (updatedContracts[contractName] != address(0)) {
+            return updatedContracts[contractName];
         }
         return vm.envAddress(envvar);
+    }
+
+    function zDeployedInstance(string memory contractName, uint256 index) public view returns (address) {
+        //                     ZEUS_DEPLOYED_ + key_Proxy + _$INDEX
+        string memory lookupKey = contractName.concat("_").concat(vm.toString(index));
+        string memory envvar = addressPrefix.concat(lookupKey);
+        if (updatedContracts[lookupKey] != address(0)) {
+            return updatedContracts[lookupKey];
+        }
+        return vm.envAddress(envvar);
+    }
+
+    function zDeployedInstanceCount(string memory key) public view returns (uint256) {
+        uint256 count = 0;
+        do {
+            // try-catching zDeployedInstance() wasn't an option, because
+            // solidity can't handle try/catch on a non-external call xD
+            string memory lookupKey = key.concat("_").concat(vm.toString(count));
+            string memory envvar = addressPrefix.concat(lookupKey);
+            if (updatedContracts[lookupKey] != address(0)) {
+                count++;
+                continue;
+            }
+
+            address res = vm.envOr(envvar, address(0));
+            if (res == address(0)) {
+                // no address is set.
+                return count;
+            }
+
+            count++;
+        } while (true);
+
+        return count;
     }
 
     function zDeployedProxy(string memory key) public view returns (address) {
