@@ -33,6 +33,11 @@ jobs:
         run: |
           forge fmt --check
         id: fmt
+      
+      - name: Run Forge test
+        run: |
+          forge test
+        id: fmt
 
       - name: Run Forge build
         run: |
