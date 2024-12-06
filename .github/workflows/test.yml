@@ -37,7 +37,7 @@ jobs:
       - name: Run Forge test
         run: |
           forge test
-        id: fmt
+        id: test
 
       - name: Run Forge build
         run: |
