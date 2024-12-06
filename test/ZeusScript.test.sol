@@ -396,7 +396,7 @@ contract ZeusScriptTest is ZeusScript {
 
     function testInvalidEnvAddress() public {
         vm.setEnv("ZEUS_ENV_INVALID_ADDRESS", "notAnAddress");
-        vm.expectRevert(); 
+        vm.expectRevert();
         zAddress("INVALID_ADDRESS");
     }
 
@@ -440,5 +440,4 @@ contract ZeusScriptTest is ZeusScript {
         zUpdateUint64("RETEST_UINT64", 3000);
         assertEq(zUint64("RETEST_UINT64"), 3000);
     }
-
 }
