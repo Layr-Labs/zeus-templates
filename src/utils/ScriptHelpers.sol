@@ -2,7 +2,6 @@
 pragma solidity ^0.8.12;
 
 library ScriptHelpers {
-
     string internal constant IMPL_SUFFIX = "_Impl";
     string internal constant PROXY_SUFFIX = "_Proxy";
 

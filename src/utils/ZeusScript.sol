@@ -42,6 +42,16 @@ abstract contract ZeusScript is Script, Test {
     string internal constant addressPrefix = "ZEUS_DEPLOYED_";
     string internal constant envPrefix = "ZEUS_ENV_";
 
+    enum Cleanliness {
+        UNCHANGED, // this key has not been touched previously
+        UPTODATE, // this key has been asserted since its last change
+        DIRTY // this key has a pending unasserted change.
+
+    }
+
+    mapping(string => Cleanliness) internal _dirty; // 1 if dirty, else 0.
+    string[] internal _modifiedKeys;
+
     mapping(string => address) internal updatedContracts;
     mapping(string => EnvironmentVariableType) updatedTypes;
     mapping(string => string) updatedStrings;
@@ -52,6 +62,18 @@ abstract contract ZeusScript is Script, Test {
     mapping(string => uint16) updatedUInt16s;
     mapping(string => uint8) updatedUInt8s;
     mapping(string => bool) updatedBools;
+
+    function _markDirty(string memory key) private {
+        if (_dirty[key] == Cleanliness.UNCHANGED) {
+            _modifiedKeys.push(key);
+        }
+        _dirty[key] = Cleanliness.DIRTY;
+    }
+
+    function _clean(string memory key) private {
+        require(_dirty[key] == Cleanliness.DIRTY, "Asserted key was unchanged.");
+        _dirty[key] = Cleanliness.UPTODATE;
+    }
 
     /**
      * Environment manipulation - update variables in the current environment's configuration *****
@@ -169,6 +191,35 @@ abstract contract ZeusScript is Script, Test {
             return updatedContracts[lookupKey];
         }
         return vm.envAddress(envvar);
+    }
+
+    function zAssertDeployed(string[] memory contractNames) public {
+        zAssertTest();
+        for (uint256 i = 0; i < contractNames.length; i++) {
+            _clean(contractNames[i]);
+        }
+    }
+
+    function zAssertUpdated(string[] memory environmentParameters) public {
+        zAssertTest();
+        for (uint256 i = 0; i < environmentParameters.length; i++) {
+            _clean(environmentParameters[i]);
+        }
+    }
+
+    function zAssertClean() public {
+        zAssertTest();
+
+        for (uint256 i = 0; i < _modifiedKeys.length; i++) {
+            string memory message = string.concat(_modifiedKeys[i], ": key was not asserted");
+            require(uint256(_dirty[_modifiedKeys[i]]) == uint256(Cleanliness.UPTODATE), message);
+        }
+
+        delete _modifiedKeys;
+    }
+
+    function zAssertTest() public view {
+        require(vm.envBool("ZEUS_TEST"), "not a zeus test");
     }
 
     function zDeployedInstanceCount(string memory key) public view returns (uint256) {
