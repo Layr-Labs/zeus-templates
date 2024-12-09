@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: BUSL-1.1
 pragma solidity ^0.8.12;
 
+import "../utils/ZEnvHelpers.sol";
 import {ZeusScript} from "../utils/ZeusScript.sol";
 import {ScriptHelpers} from "../utils/ScriptHelpers.sol";
 
@@ -10,7 +11,7 @@ import {ScriptHelpers} from "../utils/ScriptHelpers.sol";
  */
 abstract contract EOADeployer is ZeusScript {
     using ScriptHelpers for *;
-
+    using ZEnvHelpers for *;
     Deployment[] private _deployments;
 
     /**
@@ -56,17 +57,19 @@ abstract contract EOADeployer is ZeusScript {
     function deploySingleton(address deployedTo, string memory name) internal {
         emit ZeusDeploy(name, deployedTo, true /* singleton */ );
         _deployments.push(Deployment(deployedTo, name, true));
-        updatedContracts[name] = deployedTo;
+        ZEnvHelpers.state().updatedContracts[name] = deployedTo;
     }
 
     function deployInstance(address deployedTo, string memory name) internal {
         emit ZeusDeploy(name, deployedTo, false /* singleton */ );
         _deployments.push(Deployment(deployedTo, name, false));
 
-        uint256 count = zDeployedInstanceCount(name);
-        string memory env = string.concat(name, string.concat("_", vm.toString(count)));
+        State storage state = ZEnvHelpers.state();
 
-        updatedContracts[env] = deployedTo;
+        uint256 count = state.deployedInstanceCount(name);
+        string memory env = string.concat(name, "_", vm.toString(count));
+
+        state.updatedContracts[env] = deployedTo;
     }
 
     function deploys() public view returns (Deployment[] memory) {
