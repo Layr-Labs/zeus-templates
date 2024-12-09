@@ -58,7 +58,7 @@ abstract contract EOADeployer is ZeusScript {
     function deploySingleton(address deployedTo, string memory name) internal {
         emit ZeusDeploy(name, deployedTo, true /* singleton */ );
         _deployments.push(Deployment(deployedTo, name, true));
-        ZEnvHelpers.state().updatedContracts[name] = deployedTo;
+        ZEnvHelpers.state().__updateContract(name, deployedTo);
     }
 
     function deployInstance(address deployedTo, string memory name) internal {
@@ -70,7 +70,7 @@ abstract contract EOADeployer is ZeusScript {
         uint256 count = state.deployedInstanceCount(name);
         string memory env = string.concat(name, "_", vm.toString(count));
 
-        state.updatedContracts[env] = deployedTo;
+        state.__updateContract(env, deployedTo);
     }
 
     function deploys() public view returns (Deployment[] memory) {

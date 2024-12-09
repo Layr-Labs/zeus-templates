@@ -3,13 +3,16 @@ pragma solidity ^0.8.12;
 
 import {Test} from "forge-std/Test.sol";
 import {ZeusScript, EncGnosisSafe} from "../src/utils/ZeusScript.sol";
+import { EOADeployer } from "../src/templates/EOADeployer.sol";
 import "../src/utils/ZEnvHelpers.sol";
 import {StringUtils} from "../src/utils/StringUtils.sol";
 import {ScriptHelpers} from "../src/utils/ScriptHelpers.sol";
 
-contract ZeusScriptTest is ZeusScript {
+contract ZeusScriptTest is EOADeployer {
     using ScriptHelpers for *;
     using ZEnvHelpers for *;
+
+    function _runAsEOA() internal override {}
 
     function setUp() public {
         // Set some environment variables to test fallback logic with simple incremental addresses.
@@ -32,30 +35,36 @@ contract ZeusScriptTest is ZeusScript {
     }
 
     function testZAssert() public {
+        State storage state = ZEnvHelpers.state();
+
+        // simple deploys
         do {
             string[] memory contracts = new string[](2);
-            contracts[0] = "MyContract";
-            contracts[1] = "AnotherContract";
+            contracts[0] = "MyContract".impl();
+            contracts[1] = "AnotherContract".impl();
 
-            // Mark them as DIRTY initially
-            _dirty["MyContract"] = Cleanliness.DIRTY;
-            _dirty["AnotherContract"] = Cleanliness.DIRTY;
+            deploySingleton(address(1000), contracts[0]);
+            deploySingleton(address(2000), contracts[1]);
+            deployInstance(address(2000), contracts[1]);
 
             // Call zAssertDeployed
-            zAssertDeployed(contracts);
+            state.assertDeployed(contracts);
 
-            // After this call, we expect both keys to be UPTODATE
-            assertEq(uint256(_dirty["MyContract"]), uint256(Cleanliness.UPTODATE));
-            assertEq(uint256(_dirty["AnotherContract"]), uint256(Cleanliness.UPTODATE));
+            string[] memory instancesDeployed = new string[](1);
+            instancesDeployed[0] = contracts[1].instance("0");
+
+            state.assertDeployed(instancesDeployed);
+            state.assertClean();
         } while (false);
 
+        // simple state updates
         do {
             vm.setEnv("ZEUS_TEST", "false");
             string[] memory contracts = new string[](1);
             contracts[0] = "MyContract";
 
             vm.expectRevert("not a zeus test");
-            zAssertDeployed(contracts);
+            state.assertDeployed(contracts);
             vm.setEnv("ZEUS_TEST", "true");
 
             string[] memory envParams = new string[](2);
@@ -63,57 +72,93 @@ contract ZeusScriptTest is ZeusScript {
             envParams[1] = "OWNER_ADDRESS";
 
             // Mark them as DIRTY
-            _dirty["API_KEY"] = Cleanliness.DIRTY;
-            _dirty["OWNER_ADDRESS"] = Cleanliness.DIRTY;
+            zUpdate("API_KEY", "123");
+            zUpdate("OWNER_ADDRESS", address(1));
 
-            zAssertUpdated(envParams);
-
-            assertEq(uint256(_dirty["API_KEY"]), uint256(Cleanliness.UPTODATE));
-            assertEq(uint256(_dirty["OWNER_ADDRESS"]), uint256(Cleanliness.UPTODATE));
+            state.assertUpdated(envParams);
+            state.assertClean();
         } while (false);
 
+        // every state type
+        do {
+            vm.setEnv("ZEUS_TEST", "true");
+            state.assertClean();
+
+            string[] memory envParams = new string[](8);
+            envParams[0] = "UINT256";
+            envParams[1] = "UINT32";
+            envParams[2] = "UINT64";
+            envParams[3] = "ADDRESS";
+            envParams[4] = "STRING";
+            envParams[5] = "BOOL";
+            envParams[6] = "UINT_16";
+            envParams[7] = "UINT_8";
+
+            zUpdateUint256("UINT256", uint256(1));
+            zUpdateUint32("UINT32", uint32(1));
+            zUpdateUint64("UINT64", uint64(1));
+            zUpdate("ADDRESS", address(1));
+            zUpdate("STRING", "1");
+            zUpdate("BOOL", true);
+            zUpdateUint16("UINT_16", uint16(1));
+            zUpdateUint8("UINT_8", uint8(1));
+
+            state.assertUpdated(envParams);
+            state.assertClean();
+        } while (false);
+
+        // a few more scenarios
         do {
             vm.setEnv("ZEUS_TEST", "false");
             string[] memory envParams = new string[](1);
             envParams[0] = "SOME_PARAM";
 
             vm.expectRevert("not a zeus test");
-            zAssertUpdated(envParams);
+            state.assertUpdated(envParams);
             vm.setEnv("ZEUS_TEST", "true");
 
             vm.setEnv("ZEUS_TEST", "true");
 
-            // Add some modified keys
-            _modifiedKeys.push("KEY1");
-            _modifiedKeys.push("KEY2");
-
-            // Mark them all as UPTODATE
-            _dirty["KEY1"] = Cleanliness.UPTODATE;
-            _dirty["KEY2"] = Cleanliness.UPTODATE;
-
-            // Should not revert
-            zAssertClean();
-
-            // Should clear _modifiedKeys
-            assertEq(_modifiedKeys.length, 0);
-
-            _modifiedKeys.push("KEY1");
-            _dirty["KEY1"] = Cleanliness.DIRTY; // Not up to date
+            zUpdate("KEY1", "1");
+            zUpdate("KEY2", "2");
 
             vm.expectRevert("KEY1: key was not asserted");
-            zAssertClean();
+            state.assertClean();
+
+            // forget some keys
+            string[] memory someKeys = new string[](1);
+            someKeys[0] = "KEY1";
+            state.assertUpdated(someKeys);
+
+            vm.expectRevert("KEY2: key was not asserted");
+            state.assertClean();
+
+            string[] memory restOfKeys = new string[](1);
+            restOfKeys[0] = "KEY2";
+
+            // after cleaning up the rest of the keys, assertClean() should be fine.
+            state.assertUpdated(restOfKeys);
+            state.assertClean();
+
+            // subsequent calls to assertClean() should not throw.
+            state.assertClean();
         } while (false);
 
         do {
             vm.setEnv("ZEUS_TEST", "false");
-            zUpdateUint256("SOME_KEY", 42); // This might add SOME_KEY to _modifiedKeys internally in real logic
-            // We'll mimic that behavior manually:
-            _modifiedKeys.push("SOME_KEY");
-            _dirty["SOME_KEY"] = Cleanliness.UPTODATE;
+            zUpdateUint256("SOME_KEY", 42); 
 
             vm.expectRevert("not a zeus test");
-            zAssertClean();
+            state.assertClean();
+
             vm.setEnv("ZEUS_TEST", "true");
+            vm.expectRevert("SOME_KEY: key was not asserted");
+            state.assertClean();
+
+            string[] memory updatedKeys = new string[](1);
+            updatedKeys[0] = "SOME_KEY";
+            state.assertUpdated(updatedKeys);
+            state.assertClean();
         } while (false);
     }
 
