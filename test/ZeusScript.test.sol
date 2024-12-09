@@ -3,11 +3,13 @@ pragma solidity ^0.8.12;
 
 import {Test} from "forge-std/Test.sol";
 import {ZeusScript, EncGnosisSafe} from "../src/utils/ZeusScript.sol";
+import "../src/utils/ZEnvHelpers.sol";
 import {StringUtils} from "../src/utils/StringUtils.sol";
 import {ScriptHelpers} from "../src/utils/ScriptHelpers.sol";
 
 contract ZeusScriptTest is ZeusScript {
     using ScriptHelpers for *;
+    using ZEnvHelpers for *;
 
     function setUp() public {
         // Set some environment variables to test fallback logic with simple incremental addresses.
@@ -21,7 +23,6 @@ contract ZeusScriptTest is ZeusScript {
         vm.setEnv("ZEUS_ENV_MY_FALLBACK_UINT64", "7777777");
 
         // Set environment variables for deployed contracts, using simple addresses like 0x2, 0x3, etc.
-        vm.setEnv("ZEUS_DEPLOYED_MyContract", "0x0000000000000000000000000000000000000002");
         vm.setEnv("ZEUS_DEPLOYED_MyContract_0", "0x0000000000000000000000000000000000000003");
         vm.setEnv("ZEUS_DEPLOYED_MyContract_1", "0x0000000000000000000000000000000000000004");
         vm.setEnv("ZEUS_DEPLOYED_MyContract_Proxy", "0x0000000000000000000000000000000000000005");
@@ -121,17 +122,21 @@ contract ZeusScriptTest is ZeusScript {
     // --------------------------------------
 
     function testUpdateString() public {
+        State storage state = ZEnvHelpers.state();
+
         vm.expectEmit(true, true, true, true);
         emit ZeusEnvironmentUpdate("MY_STRING_KEY", EnvironmentVariableType.STRING, abi.encode("hello"));
 
         string memory updated = zUpdate("MY_STRING_KEY", "hello");
         assertEq(updated, "hello");
-        assertEq(uint256(updatedTypes["MY_STRING_KEY"]), uint256(EnvironmentVariableType.STRING));
+        assertEq(uint256(state.updatedTypes["MY_STRING_KEY"]), uint256(EnvironmentVariableType.STRING));
         // The code stores the key itself in updatedStrings
-        assertEq(updatedStrings["MY_STRING_KEY"], "MY_STRING_KEY");
+        assertEq(state.updatedStrings["MY_STRING_KEY"], "MY_STRING_KEY");
     }
 
     function testUpdateAddress() public {
+        State storage state = ZEnvHelpers.state();
+
         address testAddr = address(0x1234);
 
         vm.expectEmit(true, true, true, true);
@@ -139,11 +144,12 @@ contract ZeusScriptTest is ZeusScript {
 
         address updated = zUpdate("MY_ADDRESS_KEY", testAddr);
         assertEq(updated, testAddr);
-        assertEq(uint256(updatedTypes["MY_ADDRESS_KEY"]), uint256(EnvironmentVariableType.ADDRESS));
-        assertEq(updatedAddresses["MY_ADDRESS_KEY"], testAddr);
+        assertEq(uint256(state.updatedTypes["MY_ADDRESS_KEY"]), uint256(EnvironmentVariableType.ADDRESS));
+        assertEq(state.updatedAddresses["MY_ADDRESS_KEY"], testAddr);
     }
 
     function testUpdateUint256() public {
+        State storage state = ZEnvHelpers.state();
         uint256 val = 42;
 
         vm.expectEmit(true, true, true, true);
@@ -151,11 +157,12 @@ contract ZeusScriptTest is ZeusScript {
 
         uint256 updated = zUpdateUint256("MY_UINT256_KEY", val);
         assertEq(updated, val);
-        assertEq(uint256(updatedTypes["MY_UINT256_KEY"]), uint256(EnvironmentVariableType.UINT_256));
-        assertEq(updatedUInt256s["MY_UINT256_KEY"], val);
+        assertEq(uint256(state.updatedTypes["MY_UINT256_KEY"]), uint256(EnvironmentVariableType.UINT_256));
+        assertEq(state.updatedUInt256s["MY_UINT256_KEY"], val);
     }
 
     function testUpdateUint64() public {
+        State storage state = ZEnvHelpers.state();
         uint64 val = 98765;
 
         vm.expectEmit(true, true, true, true);
@@ -163,11 +170,12 @@ contract ZeusScriptTest is ZeusScript {
 
         uint64 updated = zUpdateUint64("MY_UINT64_KEY", val);
         assertEq(updated, val);
-        assertEq(uint256(updatedTypes["MY_UINT64_KEY"]), uint256(EnvironmentVariableType.UINT_64));
-        assertEq(updatedUInt64s["MY_UINT64_KEY"], val);
+        assertEq(uint256(state.updatedTypes["MY_UINT64_KEY"]), uint256(EnvironmentVariableType.UINT_64));
+        assertEq(state.updatedUInt64s["MY_UINT64_KEY"], val);
     }
 
     function testUpdateUint32() public {
+        State storage state = ZEnvHelpers.state();
         uint32 val = 1234;
 
         vm.expectEmit(true, true, true, true);
@@ -175,11 +183,12 @@ contract ZeusScriptTest is ZeusScript {
 
         uint32 updated = zUpdateUint32("MY_UINT32_KEY", val);
         assertEq(updated, val);
-        assertEq(uint256(updatedTypes["MY_UINT32_KEY"]), uint256(EnvironmentVariableType.UINT_32));
-        assertEq(updatedUInt32s["MY_UINT32_KEY"], val);
+        assertEq(uint256(state.updatedTypes["MY_UINT32_KEY"]), uint256(EnvironmentVariableType.UINT_32));
+        assertEq(state.updatedUInt32s["MY_UINT32_KEY"], val);
     }
 
     function testUpdateUint16() public {
+        State storage state = ZEnvHelpers.state();
         uint16 val = 4321;
 
         vm.expectEmit(true, true, true, true);
@@ -187,11 +196,12 @@ contract ZeusScriptTest is ZeusScript {
 
         uint16 updated = zUpdateUint16("MY_UINT16_KEY", val);
         assertEq(updated, val);
-        assertEq(uint256(updatedTypes["MY_UINT16_KEY"]), uint256(EnvironmentVariableType.UINT_16));
-        assertEq(updatedUInt16s["MY_UINT16_KEY"], val);
+        assertEq(uint256(state.updatedTypes["MY_UINT16_KEY"]), uint256(EnvironmentVariableType.UINT_16));
+        assertEq(state.updatedUInt16s["MY_UINT16_KEY"], val);
     }
 
     function testUpdateUint8() public {
+        State storage state = ZEnvHelpers.state();
         uint8 val = 99;
 
         vm.expectEmit(true, true, true, true);
@@ -199,11 +209,12 @@ contract ZeusScriptTest is ZeusScript {
 
         uint8 updated = zUpdateUint8("MY_UINT8_KEY", val);
         assertEq(updated, val);
-        assertEq(uint256(updatedTypes["MY_UINT8_KEY"]), uint256(EnvironmentVariableType.UINT_8));
-        assertEq(updatedUInt8s["MY_UINT8_KEY"], val);
+        assertEq(uint256(state.updatedTypes["MY_UINT8_KEY"]), uint256(EnvironmentVariableType.UINT_8));
+        assertEq(state.updatedUInt8s["MY_UINT8_KEY"], val);
     }
 
     function testUpdateBool() public {
+        State storage state = ZEnvHelpers.state();
         bool val = true;
 
         vm.expectEmit(true, true, true, true);
@@ -211,8 +222,8 @@ contract ZeusScriptTest is ZeusScript {
 
         bool updated = zUpdate("MY_BOOL_KEY", val);
         assertTrue(updated);
-        assertEq(uint256(updatedTypes["MY_BOOL_KEY"]), uint256(EnvironmentVariableType.BOOL));
-        assertEq(updatedBools["MY_BOOL_KEY"], true);
+        assertEq(uint256(state.updatedTypes["MY_BOOL_KEY"]), uint256(EnvironmentVariableType.BOOL));
+        assertEq(state.updatedBools["MY_BOOL_KEY"], true);
     }
 
     function testUpdatePreventsTypeChange() public {
@@ -232,57 +243,52 @@ contract ZeusScriptTest is ZeusScript {
     // Test Deployed Contract and Instances
     // --------------------------------------
 
-    function testZDeployedContractFallbackToVmEnv() public view {
-        address deployed = zDeployedContract("MyContract");
-        assertEq(deployed, address(0x0000000000000000000000000000000000000002));
-    }
-
-    function testZDeployedContractWithOverride() public {
-        updatedContracts["MyContract"] = address(0x1111111111111111111111111111111111111111);
-        address deployed = zDeployedContract("MyContract");
-        assertEq(deployed, address(0x1111111111111111111111111111111111111111));
-    }
-
     function testZDeployedInstanceFallback() public view {
+        State storage state = ZEnvHelpers.state();
         // from env: ZEUS_DEPLOYED_MyContract_0 = 0x...bbbb
         //           ZEUS_DEPLOYED_MyContract_1 = 0x...cccc
-        address inst0 = zDeployedInstance("MyContract", 0);
-        address inst1 = zDeployedInstance("MyContract", 1);
+        address inst0 = state.deployedInstance("MyContract", 0);
+        address inst1 = state.deployedInstance("MyContract", 1);
         assertEq(inst0, address(0x0000000000000000000000000000000000000003));
         assertEq(inst1, address(0x0000000000000000000000000000000000000004));
     }
 
     function testZDeployedInstanceWithOverrides() public {
-        updatedContracts["MyContract_0"] = address(0x1111111111111111111111111111111111111111);
-        updatedContracts["MyContract_1"] = address(0x2222222222222222222222222222222222222222);
+        State storage state = ZEnvHelpers.state();
+        state.updatedContracts["MyContract_0"] = address(0x1111111111111111111111111111111111111111);
+        state.updatedContracts["MyContract_1"] = address(0x2222222222222222222222222222222222222222);
 
-        address inst0 = zDeployedInstance("MyContract", 0);
-        address inst1 = zDeployedInstance("MyContract", 1);
+        address inst0 = state.deployedInstance("MyContract", 0);
+        address inst1 = state.deployedInstance("MyContract", 1);
         assertEq(inst0, address(0x1111111111111111111111111111111111111111));
         assertEq(inst1, address(0x2222222222222222222222222222222222222222));
     }
 
     function testZDeployedInstanceCountWithOverrides() public {
-        updatedContracts["MyContract_0"] = address(0x1111111111111111111111111111111111111111);
-        updatedContracts["MyContract_1"] = address(0x2222222222222222222222222222222222222222);
+        State storage state = ZEnvHelpers.state();
+        state.updatedContracts["MyContract_0"] = address(0x1111111111111111111111111111111111111111);
+        state.updatedContracts["MyContract_1"] = address(0x2222222222222222222222222222222222222222);
 
-        uint256 count = zDeployedInstanceCount("MyContract");
+        uint256 count = state.deployedInstanceCount("MyContract");
         assertEq(count, 2);
     }
 
     function testZDeployedInstanceCountFromEnv() public view {
+        State storage state = ZEnvHelpers.state();
         // We'll rely on env variables: MyContract_0 and MyContract_1 are set, MyContract_2 is not
-        uint256 count = zDeployedInstanceCount("MyContract");
+        uint256 count = state.deployedInstanceCount("MyContract");
         assertEq(count, 2);
     }
 
     function testZDeployedProxyFallback() public view {
-        address p = zDeployedProxy("MyContract");
+        State storage state = ZEnvHelpers.state();
+        address p = state.deployedProxy("MyContract");
         assertEq(p, address(0x0000000000000000000000000000000000000005));
     }
 
     function testZDeployedImplFallback() public view {
-        address i = zDeployedImpl("MyContract");
+        State storage state = ZEnvHelpers.state();
+        address i = state.deployedImpl("MyContract");
         assertEq(i, address(0x0000000000000000000000000000000000000006));
     }
 
@@ -291,49 +297,58 @@ contract ZeusScriptTest is ZeusScript {
     // --------------------------------------
 
     function testZAddressFallback() public view {
-        address val = zAddress("MY_FALLBACK_ADDRESS");
+        State storage state = ZEnvHelpers.state();
+        address val = state.envAddress("MY_FALLBACK_ADDRESS");
         assertEq(val, address(0x0000000000000000000000000000000000000001));
     }
 
     function testZUint256Fallback() public view {
-        uint256 val = zUint256("MY_FALLBACK_UINT256");
+        State storage state = ZEnvHelpers.state();
+        uint256 val = state.envU256("MY_FALLBACK_UINT256");
         assertEq(val, 9999);
     }
 
     function testZBoolFallback() public view {
-        bool val = zBool("MY_FALLBACK_BOOL");
+        State storage state = ZEnvHelpers.state();
+        bool val = state.envBool("MY_FALLBACK_BOOL");
         assertTrue(val);
     }
 
     function testZStringFallback() public view {
-        string memory val = zString("MY_FALLBACK_STRING");
+        State storage state = ZEnvHelpers.state();
+        string memory val = state.envString("MY_FALLBACK_STRING");
         assertEq(val, "fallbackValue");
     }
 
     function testZUint32Fallback() public view {
-        uint32 val = zUint32("MY_FALLBACK_UINT32");
+        State storage state = ZEnvHelpers.state();
+        uint32 val = state.envU32("MY_FALLBACK_UINT32");
         assertEq(val, 12345);
     }
 
     function testZUint16Fallback() public view {
-        uint16 val = zUint16("MY_FALLBACK_UINT16");
+        State storage state = ZEnvHelpers.state();
+        uint16 val = state.envU16("MY_FALLBACK_UINT16");
         assertEq(val, 321);
     }
 
     function testZUint8Fallback() public view {
-        uint8 val = zUint8("MY_FALLBACK_UINT8");
+        State storage state = ZEnvHelpers.state();
+        uint8 val = state.envU8("MY_FALLBACK_UINT8");
         assertEq(val, 42);
     }
 
     function testZUint64Fallback() public view {
-        uint64 val = zUint64("MY_FALLBACK_UINT64");
+        State storage state = ZEnvHelpers.state();
+        uint64 val = state.envU64("MY_FALLBACK_UINT64");
         assertEq(val, 7777777);
     }
 
     // Test updating and then calling fallback getters to ensure updated value overrides env:
     function testZBoolOverride() public {
+        State storage state = ZEnvHelpers.state();
         zUpdate("MY_FALLBACK_BOOL", false);
-        bool val = zBool("MY_FALLBACK_BOOL");
+        bool val = state.envBool("MY_FALLBACK_BOOL");
         assertFalse(val);
     }
 
@@ -362,57 +377,67 @@ contract ZeusScriptTest is ZeusScript {
     }
 
     function testZDeployedInstanceCountZero() public view {
+        State storage state = ZEnvHelpers.state();
         // No env vars or updatedContracts set for "UnknownContract".
         // This should return 0 without entering the loop multiple times.
-        uint256 count = zDeployedInstanceCount("UnknownContract");
+        uint256 count = state.deployedInstanceCount("UnknownContract");
         assertEq(count, 0);
     }
 
     function testMissingEnvVarForZDeployedContract() public {
+        State storage state = ZEnvHelpers.state();
         // Attempting to get a deployed contract that doesn't exist should revert.
         vm.expectRevert();
-        zDeployedContract("NonExistentContract");
+        state.deployedProxy("NonExistentContract");
     }
 
     function testMissingEnvVarForZAddress() public {
+        State storage state = ZEnvHelpers.state();
         // No update and no env var for this key; should revert on env lookup.
         vm.expectRevert();
-        zAddress("NoSuchKey");
+        state.envAddress("NoSuchKey");
     }
 
     function testMissingEnvVarForZBool() public {
+        State storage state = ZEnvHelpers.state();
         vm.expectRevert();
-        zBool("NoBoolKey");
+        state.envBool("NoBoolKey");
     }
 
     function testMissingEnvVarForZString() public {
+        State storage state = ZEnvHelpers.state();
         vm.expectRevert();
-        zString("NoStringKey");
+        state.envString("NoStringKey");
     }
 
     function testMissingEnvVarForZUint256() public {
+        State storage state = ZEnvHelpers.state();
         vm.expectRevert();
-        zUint256("NoUint256Key");
+        state.envU256("NoUint256Key");
     }
 
     function testMissingEnvVarForZUint64() public {
+        State storage state = ZEnvHelpers.state();
         vm.expectRevert();
-        zUint64("NoUint64Key");
+        state.envU64("NoUint64Key");
     }
 
     function testMissingEnvVarForZUint32() public {
+        State storage state = ZEnvHelpers.state();
         vm.expectRevert();
-        zUint32("NoUint32Key");
+        state.envU32("NoUint32Key");
     }
 
     function testMissingEnvVarForZUint16() public {
+        State storage state = ZEnvHelpers.state();
         vm.expectRevert();
-        zUint16("NoUint16Key");
+        state.envU16("NoUint16Key");
     }
 
     function testMissingEnvVarForZUint8() public {
+        State storage state = ZEnvHelpers.state();
         vm.expectRevert();
-        zUint8("NoUint8Key");
+        state.envU8("NoUint8Key");
     }
 
     function testZUpdateTypeChangeOnOtherTypes() public {
@@ -439,10 +464,11 @@ contract ZeusScriptTest is ZeusScript {
     }
 
     function testZDeployedInstanceNonExistentIndex() public {
+        State storage state = ZEnvHelpers.state();
         // Ensure that requesting a non-existent index reverts or returns correctly.
         // If `vm.envAddress` reverts on missing var, catch it.
         vm.expectRevert();
-        zDeployedInstance("MyContract", 999); // large index with no env
+        state.deployedInstance("MyContract", 999); // large index with no env
     }
 
     function testZeusRequireMultisigEventDelegateCall() public {
@@ -466,46 +492,45 @@ contract ZeusScriptTest is ZeusScript {
         emit ZeusMultisigExecute(address(0x123), 1, "0x5678", EncGnosisSafe.Operation.DelegateCall);
     }
 
-    function testZDeployedContractNoEnvNoUpdate() public {
-        // No env var and no updated contract entry
-        vm.expectRevert();
-        zDeployedContract("DoesNotExist");
-    }
-
     function testInvalidEnvAddress() public {
+        State storage state = ZEnvHelpers.state();
         vm.setEnv("ZEUS_ENV_INVALID_ADDRESS", "notAnAddress");
         vm.expectRevert();
-        zAddress("INVALID_ADDRESS");
+        state.envAddress("INVALID_ADDRESS");
     }
 
     function testInvalidEnvUint() public {
+        State storage state = ZEnvHelpers.state();
         vm.setEnv("ZEUS_ENV_INVALID_UINT256", "notANumber");
         vm.expectRevert();
-        zUint256("INVALID_UINT256");
+        state.envU256("INVALID_UINT256");
     }
 
     function testInvalidEnvBool() public {
+        State storage state = ZEnvHelpers.state();
         vm.setEnv("ZEUS_ENV_INVALID_BOOL", "notABool");
         vm.expectRevert();
-        zBool("INVALID_BOOL");
+        state.envBool("INVALID_BOOL");
     }
 
     function testMixedZDeployedInstanceCount() public {
+        State storage state = ZEnvHelpers.state();
         // For "MixedContract":
         // - 0 from updatedContracts
         // - 1 from environment variable
         // - 2 missing entirely
-        updatedContracts["MixedContract_0"] = address(0x0000000000000000000000000000000000000011);
+        state.updatedContracts["MixedContract_0"] = address(0x0000000000000000000000000000000000000011);
         vm.setEnv("ZEUS_DEPLOYED_MixedContract_1", "0x0000000000000000000000000000000000000012");
         // No _2 set, should return count=2
-        uint256 count = zDeployedInstanceCount("MixedContract");
+        uint256 count = state.deployedInstanceCount("MixedContract");
         assertEq(count, 2);
     }
 
     function testMultipleUpdatesSameTypeUint64() public {
+        State storage state = ZEnvHelpers.state();
         zUpdateUint64("RETEST_UINT64", 1000);
         zUpdateUint64("RETEST_UINT64", 2000);
         zUpdateUint64("RETEST_UINT64", 3000);
-        assertEq(zUint64("RETEST_UINT64"), 3000);
+        assertEq(state.envU64("RETEST_UINT64"), 3000);
     }
 }
