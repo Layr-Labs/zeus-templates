@@ -29,7 +29,6 @@ struct State {
 }
 
 library ZEnvHelpers {
-
     address internal constant VM_ADDRESS = address(uint160(uint256(keccak256("hevm cheat code"))));
     Vm internal constant vm = Vm(VM_ADDRESS);
 
@@ -39,14 +38,15 @@ library ZEnvHelpers {
     string internal constant IMPL_SUFFIX = "_Impl";
     string internal constant PROXY_SUFFIX = "_Proxy";
 
-
     bytes32 internal constant STATE_SLOT = keccak256("STATE_SLOT");
-    
+
     function state() internal pure returns (State storage s) {
         bytes32 stateSlot = STATE_SLOT;
-        assembly { s.slot := stateSlot }
+        assembly {
+            s.slot := stateSlot
+        }
     }
-    
+
     /**
      * @notice Returns the address of a proxy contract based on the provided key, querying the envvars injected by Zeus.
      * @param name The key to look up the address for. Should be the contract name, e.g. `type(DelegationManager).name`
@@ -75,9 +75,9 @@ library ZEnvHelpers {
     }
 
     // ZEUS_DEPLOYED_ + name + _$INDEX
-    function deployedInstance(State storage s, string memory name, uint idx) internal view returns (address) {
+    function deployedInstance(State storage s, string memory name, uint256 idx) internal view returns (address) {
         string memory lookupKey = string.concat(name, "_", vm.toString(idx));
-        
+
         if (s.updatedContracts[lookupKey] != address(0)) {
             return s.updatedContracts[lookupKey];
         }
@@ -86,7 +86,7 @@ library ZEnvHelpers {
         return vm.envAddress(envvar);
     }
 
-    function deployedInstanceCount(State storage s, string memory name) internal view returns (uint) {
+    function deployedInstanceCount(State storage s, string memory name) internal view returns (uint256) {
         uint256 count = 0;
         do {
             string memory lookupKey = string.concat(name, "_", vm.toString(count));
@@ -113,7 +113,7 @@ library ZEnvHelpers {
      * Returns an `address` set in the current environment. NOTE: If you deployed this contract with zeus, you want `deployedX` instead.
      * @param key The environment key. Corresponds to a ZEUS_* env variable.
      */
-    function envAddress(State storage s, string memory key) internal view returns (address) {        
+    function envAddress(State storage s, string memory key) internal view returns (address) {
         if (s.updatedTypes[key] != EnvironmentVariableType.UNMODIFIED) {
             return s.updatedAddresses[key];
         }
@@ -126,13 +126,13 @@ library ZEnvHelpers {
      * Returns a uint256 set in the current environment.
      * @param key The environment key. Corresponds to a ZEUS_* env variable.
      */
-    function envU256(State storage s, string memory key) internal view returns (uint) {
+    function envU256(State storage s, string memory key) internal view returns (uint256) {
         if (s.updatedTypes[key] != EnvironmentVariableType.UNMODIFIED) {
             return s.updatedUInt256s[key];
         }
 
         string memory envvar = string.concat(ENV_PREFIX, key);
-        return uint(vm.envUint(envvar));
+        return uint256(vm.envUint(envvar));
     }
 
     /**

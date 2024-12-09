@@ -11,5 +11,5 @@ library ScriptHelpers {
 
     function proxy(string memory name) internal pure returns (string memory) {
         return string.concat(name, PROXY_SUFFIX);
-    }  
+    }
 }

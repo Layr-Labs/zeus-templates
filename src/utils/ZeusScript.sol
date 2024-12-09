@@ -55,9 +55,9 @@ abstract contract ZeusScript is Script, Test {
     // NOTE: you do not need to use these for contract addresses, which are tracked and injected automatically.
     // NOTE: do not use `.update()` during a vm.broadcast() segment.
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    function zUpdate(string memory key, string memory value) public returns (string memory) {        
+    function zUpdate(string memory key, string memory value) public returns (string memory) {
         State storage state = ZEnvHelpers.state();
-        
+
         require(
             state.updatedTypes[key] == EnvironmentVariableType.UNMODIFIED
                 || state.updatedTypes[key] == EnvironmentVariableType.STRING
@@ -70,7 +70,7 @@ abstract contract ZeusScript is Script, Test {
 
     function zUpdate(string memory key, address value) public returns (address) {
         State storage state = ZEnvHelpers.state();
-        
+
         require(
             state.updatedTypes[key] == EnvironmentVariableType.UNMODIFIED
                 || state.updatedTypes[key] == EnvironmentVariableType.ADDRESS
@@ -83,7 +83,7 @@ abstract contract ZeusScript is Script, Test {
 
     function zUpdateUint256(string memory key, uint256 value) public returns (uint256) {
         State storage state = ZEnvHelpers.state();
-        
+
         require(
             state.updatedTypes[key] == EnvironmentVariableType.UNMODIFIED
                 || state.updatedTypes[key] == EnvironmentVariableType.UINT_256
@@ -96,7 +96,7 @@ abstract contract ZeusScript is Script, Test {
 
     function zUpdateUint64(string memory key, uint64 value) public returns (uint64) {
         State storage state = ZEnvHelpers.state();
-        
+
         require(
             state.updatedTypes[key] == EnvironmentVariableType.UNMODIFIED
                 || state.updatedTypes[key] == EnvironmentVariableType.UINT_64
@@ -109,7 +109,7 @@ abstract contract ZeusScript is Script, Test {
 
     function zUpdateUint32(string memory key, uint32 value) public returns (uint32) {
         State storage state = ZEnvHelpers.state();
-        
+
         require(
             state.updatedTypes[key] == EnvironmentVariableType.UNMODIFIED
                 || state.updatedTypes[key] == EnvironmentVariableType.UINT_32
@@ -122,7 +122,7 @@ abstract contract ZeusScript is Script, Test {
 
     function zUpdateUint16(string memory key, uint16 value) public returns (uint16) {
         State storage state = ZEnvHelpers.state();
-        
+
         require(
             state.updatedTypes[key] == EnvironmentVariableType.UNMODIFIED
                 || state.updatedTypes[key] == EnvironmentVariableType.UINT_16
@@ -135,7 +135,7 @@ abstract contract ZeusScript is Script, Test {
 
     function zUpdateUint8(string memory key, uint8 value) public returns (uint8) {
         State storage state = ZEnvHelpers.state();
-        
+
         require(
             state.updatedTypes[key] == EnvironmentVariableType.UNMODIFIED
                 || state.updatedTypes[key] == EnvironmentVariableType.UINT_8
@@ -148,9 +148,9 @@ abstract contract ZeusScript is Script, Test {
 
     function zUpdate(string memory key, bool value) public returns (bool) {
         State storage state = ZEnvHelpers.state();
-        
+
         require(
-            state.updatedTypes[key] == EnvironmentVariableType.UNMODIFIED 
+            state.updatedTypes[key] == EnvironmentVariableType.UNMODIFIED
                 || state.updatedTypes[key] == EnvironmentVariableType.BOOL
         );
         state.updatedTypes[key] = EnvironmentVariableType.BOOL;
