@@ -2,12 +2,14 @@
 pragma solidity ^0.8.12;
 
 import {ZeusScript} from "../utils/ZeusScript.sol";
+import {ScriptHelpers} from "../utils/ScriptHelpers.sol";
 
 /**
  * @title EOADeployer
  * @notice Template for an Externally Owned Account (EOA) deploy script.
  */
 abstract contract EOADeployer is ZeusScript {
+    using ScriptHelpers for *;
     Deployment[] private _deployments;
 
     /**
@@ -34,6 +36,21 @@ abstract contract EOADeployer is ZeusScript {
      * @dev Internal function to deploy contracts based on the provided addresses, environment, and parameters.
      */
     function _runAsEOA() internal virtual;
+
+    function deployContract(string memory name, address deployedTo) internal returns (address) {
+        deploySingleton(deployedTo, name);
+        return deployedTo;
+    }
+
+    function deployImpl(string memory name, address deployedTo) internal returns (address) {
+        deploySingleton(deployedTo, name.impl());
+        return deployedTo;
+    }
+
+    function deployProxy(string memory name, address deployedTo) internal returns (address) {
+        deploySingleton(deployedTo, name.proxy());
+        return deployedTo;
+    }
 
     function deploySingleton(address deployedTo, string memory name) internal {
         emit ZeusDeploy(name, deployedTo, true /* singleton */ );

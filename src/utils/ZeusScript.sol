@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: BUSL-1.1
 pragma solidity ^0.8.12;
 
+import {ScriptHelpers} from "./ScriptHelpers.sol";
 import {StringUtils} from "./StringUtils.sol";
 import {Script} from "forge-std/Script.sol";
 import {EncGnosisSafe} from "./EncGnosisSafe.sol";
@@ -9,6 +10,7 @@ import {console} from "forge-std/console.sol";
 
 abstract contract ZeusScript is Script, Test {
     using StringUtils for string;
+    using ScriptHelpers for *;
 
     enum Operation {
         Call,
@@ -40,9 +42,6 @@ abstract contract ZeusScript is Script, Test {
     string internal constant addressPrefix = "ZEUS_DEPLOYED_";
     string internal constant envPrefix = "ZEUS_ENV_";
 
-    string internal constant implSuffix = "_Impl";
-    string internal constant proxySuffix = "_Proxy";
-
     mapping(string => address) internal updatedContracts;
     mapping(string => EnvironmentVariableType) updatedTypes;
     mapping(string => string) updatedStrings;
@@ -53,14 +52,6 @@ abstract contract ZeusScript is Script, Test {
     mapping(string => uint16) updatedUInt16s;
     mapping(string => uint8) updatedUInt8s;
     mapping(string => bool) updatedBools;
-
-    function impl(string memory contractName) public pure returns (string memory) {
-        return contractName.concat(implSuffix);
-    }
-
-    function proxy(string memory contractName) public pure returns (string memory) {
-        return contractName.concat(proxySuffix);
-    }
 
     /**
      * Environment manipulation - update variables in the current environment's configuration *****
@@ -206,7 +197,7 @@ abstract contract ZeusScript is Script, Test {
 
     function zDeployedProxy(string memory key) public view returns (address) {
         //                     ZEUS_DEPLOYED_ + key_Proxy
-        string memory lookupKey = this.proxy(key);
+        string memory lookupKey = key.proxy();
         string memory envvar = addressPrefix.concat(lookupKey);
         if (updatedContracts[lookupKey] != address(0)) {
             return updatedContracts[lookupKey];
@@ -216,7 +207,7 @@ abstract contract ZeusScript is Script, Test {
 
     function zDeployedImpl(string memory key) public view returns (address) {
         //                     ZEUS_DEPLOYED_ + key_Impl
-        string memory lookupKey = this.impl(key);
+        string memory lookupKey = key.impl();
         string memory envvar = addressPrefix.concat(lookupKey);
         if (updatedContracts[lookupKey] != address(0)) {
             return updatedContracts[lookupKey];
