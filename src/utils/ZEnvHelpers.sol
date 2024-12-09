@@ -15,6 +15,13 @@ enum EnvironmentVariableType {
     UINT_8
 }
 
+enum Cleanliness {
+    UNCHANGED, // this key has not been touched previously
+    UPTODATE, // this key has been asserted since its last change
+    DIRTY // this key has a pending unasserted change.
+
+}
+
 struct State {
     mapping(string => address) updatedContracts;
     mapping(string => EnvironmentVariableType) updatedTypes;
@@ -26,6 +33,10 @@ struct State {
     mapping(string => uint16) updatedUInt16s;
     mapping(string => uint8) updatedUInt8s;
     mapping(string => bool) updatedBools;
+
+    ////////////////////////////////////
+    mapping(string => Cleanliness) _dirty;
+    string[] _modifiedKeys;
 }
 
 library ZEnvHelpers {
@@ -45,6 +56,16 @@ library ZEnvHelpers {
         assembly {
             s.slot := stateSlot
         }
+    }
+
+    /**
+     * NOTE: do not use this directly.
+     *
+     * please use deploySingleton / deployInstance from the EOADeployer.
+     */
+    function __updateContract(State storage s, string memory name, address deployedTo) internal {
+        __markDirty(s, name);
+        s.updatedContracts[name] = deployedTo;
     }
 
     /**
@@ -211,5 +232,56 @@ library ZEnvHelpers {
 
         string memory envvar = string.concat(ENV_PREFIX, key);
         return vm.envBool(envvar);
+    }
+
+    /**
+     * Asserts that a contract was deployed, via deploySingleton/deployInstance/deployContract.
+     */
+    function assertDeployed(State storage s, string[] memory contractNames) public onlyTest {
+        for (uint256 i = 0; i < contractNames.length; i++) {
+            clean(s, contractNames[i]);
+        }
+    }
+
+    /**
+     * Asserts that an environment variable was updated, i.e via `zUpdate*(...)`
+     */
+    function assertUpdated(State storage s, string[] memory environmentParameters) public onlyTest {
+        for (uint256 i = 0; i < environmentParameters.length; i++) {
+            clean(s, environmentParameters[i]);
+        }
+    }
+
+    /**
+     * Asserts that there are no;
+     *      - un-asserted changes to the state,
+     *      - un-asserted deployments.
+     */
+    function assertClean(State storage s) public onlyTest {
+        for (uint256 i = 0; i < s._modifiedKeys.length; i++) {
+            string memory message = string.concat(s._modifiedKeys[i], ": key was not asserted");
+            require(uint256(s._dirty[s._modifiedKeys[i]]) == uint256(Cleanliness.UPTODATE), message);
+        }
+
+        delete s._modifiedKeys;
+    }
+
+    ///////////////////////////////////////////////////// private methods
+
+    function __markDirty(State storage s, string memory key) internal {
+        if (s._dirty[key] == Cleanliness.UNCHANGED) {
+            s._modifiedKeys.push(key);
+        }
+        s._dirty[key] = Cleanliness.DIRTY;
+    }
+
+    function clean(State storage s, string memory key) private {
+        require(s._dirty[key] == Cleanliness.DIRTY, string.concat(key, ": key was unchanged."));
+        s._dirty[key] = Cleanliness.UPTODATE;
+    }
+
+    modifier onlyTest() {
+        require(vm.envBool("ZEUS_TEST"), "not a zeus test");
+        _;
     }
 }

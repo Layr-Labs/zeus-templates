@@ -27,28 +27,6 @@ abstract contract ZeusScript is Script, Test {
     event ZeusDeploy(string name, address addr, bool singleton);
     event ZeusMultisigExecute(address to, uint256 value, bytes data, EncGnosisSafe.Operation op);
 
-    enum Cleanliness {
-        UNCHANGED, // this key has not been touched previously
-        UPTODATE, // this key has been asserted since its last change
-        DIRTY // this key has a pending unasserted change.
-
-    }
-
-    mapping(string => Cleanliness) internal _dirty; // 1 if dirty, else 0.
-    string[] internal _modifiedKeys;
-
-    function _markDirty(string memory key) private {
-        if (_dirty[key] == Cleanliness.UNCHANGED) {
-            _modifiedKeys.push(key);
-        }
-        _dirty[key] = Cleanliness.DIRTY;
-    }
-
-    function _clean(string memory key) private {
-        require(_dirty[key] == Cleanliness.DIRTY, "Asserted key was unchanged.");
-        _dirty[key] = Cleanliness.UPTODATE;
-    }
-
     /**
      * Environment manipulation - update variables in the current environment's configuration *****
      */
@@ -64,6 +42,7 @@ abstract contract ZeusScript is Script, Test {
         );
         state.updatedTypes[key] = EnvironmentVariableType.STRING;
         state.updatedStrings[key] = key;
+        state.__markDirty(key);
         emit ZeusEnvironmentUpdate(key, EnvironmentVariableType.STRING, abi.encode(value));
         return value;
     }
@@ -77,6 +56,7 @@ abstract contract ZeusScript is Script, Test {
         );
         state.updatedTypes[key] = EnvironmentVariableType.ADDRESS;
         state.updatedAddresses[key] = value;
+        state.__markDirty(key);
         emit ZeusEnvironmentUpdate(key, EnvironmentVariableType.ADDRESS, abi.encode(value));
         return value;
     }
@@ -90,6 +70,7 @@ abstract contract ZeusScript is Script, Test {
         );
         state.updatedTypes[key] = EnvironmentVariableType.UINT_256;
         state.updatedUInt256s[key] = value;
+        state.__markDirty(key);
         emit ZeusEnvironmentUpdate(key, EnvironmentVariableType.UINT_256, abi.encode(value));
         return value;
     }
@@ -104,6 +85,7 @@ abstract contract ZeusScript is Script, Test {
         state.updatedTypes[key] = EnvironmentVariableType.UINT_64;
         state.updatedUInt64s[key] = value;
         emit ZeusEnvironmentUpdate(key, EnvironmentVariableType.UINT_64, abi.encode(value));
+        state.__markDirty(key);
         return value;
     }
 
@@ -117,6 +99,7 @@ abstract contract ZeusScript is Script, Test {
         state.updatedTypes[key] = EnvironmentVariableType.UINT_32;
         state.updatedUInt32s[key] = value;
         emit ZeusEnvironmentUpdate(key, EnvironmentVariableType.UINT_32, abi.encode(value));
+        state.__markDirty(key);
         return value;
     }
 
@@ -130,6 +113,7 @@ abstract contract ZeusScript is Script, Test {
         state.updatedTypes[key] = EnvironmentVariableType.UINT_16;
         state.updatedUInt16s[key] = value;
         emit ZeusEnvironmentUpdate(key, EnvironmentVariableType.UINT_16, abi.encode(value));
+        state.__markDirty(key);
         return value;
     }
 
@@ -143,6 +127,7 @@ abstract contract ZeusScript is Script, Test {
         state.updatedTypes[key] = EnvironmentVariableType.UINT_8;
         state.updatedUInt8s[key] = value;
         emit ZeusEnvironmentUpdate(key, EnvironmentVariableType.UINT_8, abi.encode(value));
+        state.__markDirty(key);
         return value;
     }
 
@@ -156,36 +141,7 @@ abstract contract ZeusScript is Script, Test {
         state.updatedTypes[key] = EnvironmentVariableType.BOOL;
         state.updatedBools[key] = value;
         emit ZeusEnvironmentUpdate(key, EnvironmentVariableType.BOOL, abi.encode(value));
+        state.__markDirty(key);
         return value;
-    }
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    function zAssertDeployed(string[] memory contractNames) public {
-        zAssertTest();
-        for (uint256 i = 0; i < contractNames.length; i++) {
-            _clean(contractNames[i]);
-        }
-    }
-
-    function zAssertUpdated(string[] memory environmentParameters) public {
-        zAssertTest();
-        for (uint256 i = 0; i < environmentParameters.length; i++) {
-            _clean(environmentParameters[i]);
-        }
-    }
-
-    function zAssertClean() public {
-        zAssertTest();
-
-        for (uint256 i = 0; i < _modifiedKeys.length; i++) {
-            string memory message = string.concat(_modifiedKeys[i], ": key was not asserted");
-            require(uint256(_dirty[_modifiedKeys[i]]) == uint256(Cleanliness.UPTODATE), message);
-        }
-
-        delete _modifiedKeys;
-    }
-
-    function zAssertTest() public view {
-        require(vm.envBool("ZEUS_TEST"), "not a zeus test");
     }
 }
