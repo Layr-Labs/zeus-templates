@@ -232,6 +232,40 @@ library ZEnvHelpers {
         return vm.envBool(envvar);
     }
 
+    /**
+     * Asserts that a contract was deployed, via deploySingleton/deployInstance/deployContract.
+     */
+    function assertDeployed(State storage s, string[] memory contractNames) public onlyTest {
+        for (uint256 i = 0; i < contractNames.length; i++) {
+            clean(s, contractNames[i]);
+        }
+    }
+
+    /**
+     * Asserts that an environment variable was updated, i.e via `zUpdate*(...)`
+     */
+    function assertUpdated(State storage s, string[] memory environmentParameters) public onlyTest {
+        for (uint256 i = 0; i < environmentParameters.length; i++) {
+            clean(s, environmentParameters[i]);
+        }
+    }
+
+    /**
+     * Asserts that there are no;
+     *      - un-asserted changes to the state,
+     *      - un-asserted deployments.
+     */
+    function assertClean(State storage s) public onlyTest {
+        for (uint256 i = 0; i < s._modifiedKeys.length; i++) {
+            string memory message = string.concat(s._modifiedKeys[i], ": key was not asserted");
+            require(uint256(s._dirty[s._modifiedKeys[i]]) == uint256(Cleanliness.UPTODATE), message);
+        }
+
+        delete s._modifiedKeys;
+    }
+
+    ///////////////////////////////////////////////////// private methods
+
     function __markDirty(State storage s, string memory key) internal {
         if (s._dirty[key] == Cleanliness.UNCHANGED) {
             s._modifiedKeys.push(key);
@@ -242,27 +276,6 @@ library ZEnvHelpers {
     function clean(State storage s, string memory key) private {
         require(s._dirty[key] == Cleanliness.DIRTY, string.concat(key, ": key was unchanged."));
         s._dirty[key] = Cleanliness.UPTODATE;
-    }
-
-    function assertDeployed(State storage s, string[] memory contractNames) public onlyTest {
-        for (uint256 i = 0; i < contractNames.length; i++) {
-            clean(s, contractNames[i]);
-        }
-    }
-
-    function assertUpdated(State storage s, string[] memory environmentParameters) public onlyTest {
-        for (uint256 i = 0; i < environmentParameters.length; i++) {
-            clean(s, environmentParameters[i]);
-        }
-    }
-
-    function assertClean(State storage s) public onlyTest {
-        for (uint256 i = 0; i < s._modifiedKeys.length; i++) {
-            string memory message = string.concat(s._modifiedKeys[i], ": key was not asserted");
-            require(uint256(s._dirty[s._modifiedKeys[i]]) == uint256(Cleanliness.UPTODATE), message);
-        }
-
-        delete s._modifiedKeys;
     }
 
     modifier onlyTest() {
