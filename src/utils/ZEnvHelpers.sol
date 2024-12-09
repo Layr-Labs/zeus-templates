@@ -173,4 +173,43 @@ library ZEnvHelpers {
         string memory envvar = string.concat(ENV_PREFIX, key);
         return uint16(vm.envUint(envvar));
     }
+
+    /**
+     * Returns a uint8 set in the current environment.
+     * @param key The environment key. Corresponds to a ZEUS_* env variable.
+     */
+    function envU8(State storage s, string memory key) internal view returns (uint8) {
+        if (s.updatedTypes[key] != EnvironmentVariableType.UNMODIFIED) {
+            return s.updatedUInt8s[key];
+        }
+
+        string memory envvar = string.concat(ENV_PREFIX, key);
+        return uint8(vm.envUint(envvar));
+    }
+
+    /**
+     * Returns a string set in the current environment.
+     * @param key The environment key. Corresponds to a ZEUS_* env variable.
+     */
+    function envString(State storage s, string memory key) internal view returns (string memory) {
+        if (s.updatedTypes[key] != EnvironmentVariableType.UNMODIFIED) {
+            return s.updatedStrings[key];
+        }
+
+        string memory envvar = string.concat(ENV_PREFIX, key);
+        return vm.envString(envvar);
+    }
+
+    /**
+     * Returns a bool set in the current environment.
+     * @param key The environment key. Corresponds to a ZEUS_* env variable.
+     */
+    function envBool(State storage s, string memory key) internal view returns (bool) {
+        if (s.updatedTypes[key] != EnvironmentVariableType.UNMODIFIED) {
+            return s.updatedBools[key];
+        }
+
+        string memory envvar = string.concat(ENV_PREFIX, key);
+        return vm.envBool(envvar);
+    }
 }
