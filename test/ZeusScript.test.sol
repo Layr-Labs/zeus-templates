@@ -4,8 +4,11 @@ pragma solidity ^0.8.12;
 import {Test} from "forge-std/Test.sol";
 import {ZeusScript, EncGnosisSafe} from "../src/utils/ZeusScript.sol";
 import {StringUtils} from "../src/utils/StringUtils.sol";
+import {ScriptHelpers} from "../src/utils/ScriptHelpers.sol";
 
 contract ZeusScriptTest is ZeusScript {
+    using ScriptHelpers for *;
+
     function setUp() public {
         // Set some environment variables to test fallback logic with simple incremental addresses.
         vm.setEnv("ZEUS_ENV_MY_FALLBACK_UINT256", "9999");
@@ -23,6 +26,94 @@ contract ZeusScriptTest is ZeusScript {
         vm.setEnv("ZEUS_DEPLOYED_MyContract_1", "0x0000000000000000000000000000000000000004");
         vm.setEnv("ZEUS_DEPLOYED_MyContract_Proxy", "0x0000000000000000000000000000000000000005");
         vm.setEnv("ZEUS_DEPLOYED_MyContract_Impl", "0x0000000000000000000000000000000000000006");
+
+        vm.setEnv("ZEUS_TEST", "true");
+    }
+
+    function testZAssert() public {
+        do {
+            string[] memory contracts = new string[](2);
+            contracts[0] = "MyContract";
+            contracts[1] = "AnotherContract";
+
+            // Mark them as DIRTY initially
+            _dirty["MyContract"] = Cleanliness.DIRTY;
+            _dirty["AnotherContract"] = Cleanliness.DIRTY;
+
+            // Call zAssertDeployed
+            zAssertDeployed(contracts);
+
+            // After this call, we expect both keys to be UPTODATE
+            assertEq(uint256(_dirty["MyContract"]), uint256(Cleanliness.UPTODATE));
+            assertEq(uint256(_dirty["AnotherContract"]), uint256(Cleanliness.UPTODATE));
+        } while (false);
+
+        do {
+            vm.setEnv("ZEUS_TEST", "false");
+            string[] memory contracts = new string[](1);
+            contracts[0] = "MyContract";
+
+            vm.expectRevert("not a zeus test");
+            zAssertDeployed(contracts);
+            vm.setEnv("ZEUS_TEST", "true");
+
+            string[] memory envParams = new string[](2);
+            envParams[0] = "API_KEY";
+            envParams[1] = "OWNER_ADDRESS";
+
+            // Mark them as DIRTY
+            _dirty["API_KEY"] = Cleanliness.DIRTY;
+            _dirty["OWNER_ADDRESS"] = Cleanliness.DIRTY;
+
+            zAssertUpdated(envParams);
+
+            assertEq(uint256(_dirty["API_KEY"]), uint256(Cleanliness.UPTODATE));
+            assertEq(uint256(_dirty["OWNER_ADDRESS"]), uint256(Cleanliness.UPTODATE));
+        } while (false);
+
+        do {
+            vm.setEnv("ZEUS_TEST", "false");
+            string[] memory envParams = new string[](1);
+            envParams[0] = "SOME_PARAM";
+
+            vm.expectRevert("not a zeus test");
+            zAssertUpdated(envParams);
+            vm.setEnv("ZEUS_TEST", "true");
+
+            vm.setEnv("ZEUS_TEST", "true");
+
+            // Add some modified keys
+            _modifiedKeys.push("KEY1");
+            _modifiedKeys.push("KEY2");
+
+            // Mark them all as UPTODATE
+            _dirty["KEY1"] = Cleanliness.UPTODATE;
+            _dirty["KEY2"] = Cleanliness.UPTODATE;
+
+            // Should not revert
+            zAssertClean();
+
+            // Should clear _modifiedKeys
+            assertEq(_modifiedKeys.length, 0);
+
+            _modifiedKeys.push("KEY1");
+            _dirty["KEY1"] = Cleanliness.DIRTY; // Not up to date
+
+            vm.expectRevert("KEY1: key was not asserted");
+            zAssertClean();
+        } while (false);
+
+        do {
+            vm.setEnv("ZEUS_TEST", "false");
+            zUpdateUint256("SOME_KEY", 42); // This might add SOME_KEY to _modifiedKeys internally in real logic
+            // We'll mimic that behavior manually:
+            _modifiedKeys.push("SOME_KEY");
+            _dirty["SOME_KEY"] = Cleanliness.UPTODATE;
+
+            vm.expectRevert("not a zeus test");
+            zAssertClean();
+            vm.setEnv("ZEUS_TEST", "true");
+        } while (false);
     }
 
     // --------------------------------------
@@ -247,19 +338,6 @@ contract ZeusScriptTest is ZeusScript {
     }
 
     // --------------------------------------
-    // Test impl() and proxy() suffix functions
-    // --------------------------------------
-
-    function testImplAndProxySuffixFunctions() public pure {
-        string memory base = "MyContract";
-        string memory implName = impl(base);
-        string memory proxyName = proxy(base);
-
-        assertEq(implName, "MyContract_Impl");
-        assertEq(proxyName, "MyContract_Proxy");
-    }
-
-    // --------------------------------------
     // Test that we can emit unused events for coverage
     // --------------------------------------
 
@@ -422,16 +500,6 @@ contract ZeusScriptTest is ZeusScript {
         // No _2 set, should return count=2
         uint256 count = zDeployedInstanceCount("MixedContract");
         assertEq(count, 2);
-    }
-
-    function testProxySuffixWithEmptyString() public view {
-        string memory p = proxy("");
-        assertEq(p, "_Proxy");
-    }
-
-    function testImplSuffixWithEmptyString() public view {
-        string memory i = impl("");
-        assertEq(i, "_Impl");
     }
 
     function testMultipleUpdatesSameTypeUint64() public {

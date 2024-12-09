@@ -10,6 +10,7 @@ import {ScriptHelpers} from "../utils/ScriptHelpers.sol";
  */
 abstract contract EOADeployer is ZeusScript {
     using ScriptHelpers for *;
+
     Deployment[] private _deployments;
 
     /**
