@@ -3,7 +3,7 @@ pragma solidity ^0.8.12;
 
 import {Test} from "forge-std/Test.sol";
 import {ZeusScript, EncGnosisSafe} from "../src/utils/ZeusScript.sol";
-import { EOADeployer } from "../src/templates/EOADeployer.sol";
+import {EOADeployer} from "../src/templates/EOADeployer.sol";
 import "../src/utils/ZEnvHelpers.sol";
 import {StringUtils} from "../src/utils/StringUtils.sol";
 import {ScriptHelpers} from "../src/utils/ScriptHelpers.sol";
@@ -146,7 +146,7 @@ contract ZeusScriptTest is EOADeployer {
 
         do {
             vm.setEnv("ZEUS_TEST", "false");
-            zUpdateUint256("SOME_KEY", 42); 
+            zUpdateUint256("SOME_KEY", 42);
 
             vm.expectRevert("not a zeus test");
             state.assertClean();

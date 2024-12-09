@@ -19,6 +19,7 @@ enum Cleanliness {
     UNCHANGED, // this key has not been touched previously
     UPTODATE, // this key has been asserted since its last change
     DIRTY // this key has a pending unasserted change.
+
 }
 
 struct State {
@@ -32,7 +33,6 @@ struct State {
     mapping(string => uint16) updatedUInt16s;
     mapping(string => uint8) updatedUInt8s;
     mapping(string => bool) updatedBools;
-
     mapping(string => Cleanliness) _dirty;
     string[] _modifiedKeys;
 }
@@ -54,16 +54,16 @@ library ZEnvHelpers {
         assembly {
             s.slot := stateSlot
         }
-    }  
+    }
 
     /**
      * NOTE: do not use this directly.
-     * 
+     *
      * please use deploySingleton / deployInstance from the EOADeployer.
      */
     function __updateContract(State storage s, string memory name, address deployedTo) internal {
         __markDirty(s, name);
-        s.updatedContracts[name] = deployedTo; 
+        s.updatedContracts[name] = deployedTo;
     }
 
     /**
@@ -265,7 +265,7 @@ library ZEnvHelpers {
         delete s._modifiedKeys;
     }
 
-    modifier onlyTest {
+    modifier onlyTest() {
         require(vm.envBool("ZEUS_TEST"), "not a zeus test");
         _;
     }
