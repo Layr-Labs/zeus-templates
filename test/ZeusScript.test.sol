@@ -2,7 +2,8 @@
 pragma solidity ^0.8.12;
 
 import {Test} from "forge-std/Test.sol";
-import {ZeusScript, EncGnosisSafe} from "../src/utils/ZeusScript.sol";
+import {ZeusScript} from "../src/utils/ZeusScript.sol";
+import "../src/utils/Encode.sol";
 import {EOADeployer} from "../src/templates/EOADeployer.sol";
 import "../src/utils/ZEnvHelpers.sol";
 import {StringUtils} from "../src/utils/StringUtils.sol";
@@ -415,10 +416,9 @@ contract ZeusScriptTest is EOADeployer {
     }
 
     function testZeusMultisigExecuteEvent() public {
-        // EncGnosisSafe.Operation is presumably the same shape as Operation
         vm.expectEmit(true, true, true, true);
-        emit ZeusMultisigExecute(address(0x123), 1, "0x1234", EncGnosisSafe.Operation.Call);
-        emit ZeusMultisigExecute(address(0x123), 1, "0x1234", EncGnosisSafe.Operation.Call);
+        emit ZeusMultisigExecute(address(0x123), 1, "0x1234", Encode.Operation.Call);
+        emit ZeusMultisigExecute(address(0x123), 1, "0x1234", Encode.Operation.Call);
     }
 
     function testZDeployedInstanceCountZero() public view {
@@ -533,8 +533,8 @@ contract ZeusScriptTest is EOADeployer {
     function testZeusMultisigExecuteEventDelegateCall() public {
         // Emit with DelegateCall operation to cover that branch
         vm.expectEmit(true, true, true, true);
-        emit ZeusMultisigExecute(address(0x123), 1, "0x5678", EncGnosisSafe.Operation.DelegateCall);
-        emit ZeusMultisigExecute(address(0x123), 1, "0x5678", EncGnosisSafe.Operation.DelegateCall);
+        emit ZeusMultisigExecute(address(0x123), 1, "0x5678", Encode.Operation.DelegateCall);
+        emit ZeusMultisigExecute(address(0x123), 1, "0x5678", Encode.Operation.DelegateCall);
     }
 
     function testInvalidEnvAddress() public {

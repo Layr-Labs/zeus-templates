@@ -33,7 +33,6 @@ struct State {
     mapping(string => uint16) updatedUInt16s;
     mapping(string => uint8) updatedUInt8s;
     mapping(string => bool) updatedBools;
-
     ////////////////////////////////////
     mapping(string => Cleanliness) _dirty;
     string[] _modifiedKeys;

@@ -2,9 +2,9 @@
 pragma solidity ^0.8.12;
 
 import "./ZEnvHelpers.sol";
+import "./Encode.sol";
 import {StringUtils} from "./StringUtils.sol";
 import {Script} from "forge-std/Script.sol";
-import {EncGnosisSafe} from "./EncGnosisSafe.sol";
 import {Test} from "forge-std/Test.sol";
 import {console} from "forge-std/console.sol";
 
@@ -25,7 +25,7 @@ abstract contract ZeusScript is Script, Test {
     event ZeusRequireMultisig(address addr, Operation callType);
     event ZeusEnvironmentUpdate(string key, EnvironmentVariableType internalType, bytes value);
     event ZeusDeploy(string name, address addr, bool singleton);
-    event ZeusMultisigExecute(address to, uint256 value, bytes data, EncGnosisSafe.Operation op);
+    event ZeusMultisigExecute(address to, uint256 value, bytes data, Encode.Operation op);
 
     /**
      * Environment manipulation - update variables in the current environment's configuration *****
