@@ -2,18 +2,12 @@
 pragma solidity ^0.8.12;
 
 import {ZeusScript} from "../utils/ZeusScript.sol";
-import {MultisigCall, MultisigCallUtils} from "../utils/MultisigCallUtils.sol";
-import {SafeTx, EncGnosisSafe} from "../utils/SafeTxUtils.sol";
 
 /**
  * @title MultisigBuilder
  * @dev Abstract contract for building arbitrary multisig scripts.
  */
 abstract contract MultisigBuilder is ZeusScript {
-    using MultisigCallUtils for MultisigCall[];
-
-    string internal constant multiSendCallOnlyName = "MultiSendCallOnly";
-
     /**
      * @notice Constructs a SafeTx object for a Gnosis Safe to ingest. Emits via `ZeusMultisigExecute`
      */
