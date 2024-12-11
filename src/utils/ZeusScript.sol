@@ -12,17 +12,12 @@ abstract contract ZeusScript is Script, Test {
     using StringUtils for string;
     using ZEnvHelpers for *;
 
-    enum Operation {
-        Call,
-        DelegateCall
-    }
-
     struct MultisigOptions {
         address addr; // the address of the multisig
-        Operation callType; // call vs. delegateCall
+        Encode.Operation callType; // call vs. delegateCall
     }
 
-    event ZeusRequireMultisig(address addr, Operation callType);
+    event ZeusRequireMultisig(address addr, Encode.Operation callType);
     event ZeusEnvironmentUpdate(string key, EnvironmentVariableType internalType, bytes value);
     event ZeusDeploy(string name, address addr, bool singleton);
     event ZeusMultisigExecute(address to, uint256 value, bytes data, Encode.Operation op);
