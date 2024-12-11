@@ -8,7 +8,6 @@ import "../utils/ZeusScript.sol";
  * @dev Abstract contract for building arbitrary multisig scripts.
  */
 abstract contract MultisigBuilder is ZeusScript {
-
     bool private hasPranked;
 
     modifier prank(address caller) {
@@ -44,5 +43,10 @@ abstract contract MultisigBuilder is ZeusScript {
     function _stopPrank() internal {
         require(hasPranked, "MultisigBuilder._stopPrank: _startPrank not called");
         vm.stopPrank();
+    }
+
+    /// @dev Only meant for use with tests. Please ensure you know what you are doing if you call this!
+    function _unsafeResetHasPranked() internal {
+        hasPranked = false;
     }
 }
