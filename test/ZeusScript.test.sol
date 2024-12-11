@@ -404,9 +404,8 @@ contract ZeusScriptTest is EOADeployer {
 
     function testZeusRequireMultisigEvent() public {
         vm.expectEmit(true, true, true, true);
-        emit ZeusRequireMultisig(address(0xabc), Operation.Call);
-        // Operation.Call and Operation.DelegateCall are from the enum defined in ZeusScript
-        emit ZeusRequireMultisig(address(0xabc), Operation.Call);
+        emit ZeusRequireMultisig(address(0xabc), Encode.Operation.Call);
+        emit ZeusRequireMultisig(address(0xabc), Encode.Operation.Call);
     }
 
     function testZeusDeployEvent() public {
@@ -519,8 +518,8 @@ contract ZeusScriptTest is EOADeployer {
     function testZeusRequireMultisigEventDelegateCall() public {
         // Emit with DelegateCall to cover enum branch
         vm.expectEmit(true, true, true, true);
-        emit ZeusRequireMultisig(address(0xabc), Operation.DelegateCall);
-        emit ZeusRequireMultisig(address(0xabc), Operation.DelegateCall);
+        emit ZeusRequireMultisig(address(0xabc), Encode.Operation.DelegateCall);
+        emit ZeusRequireMultisig(address(0xabc), Encode.Operation.DelegateCall);
     }
 
     function testZeusDeployEventFalseSingleton() public {
