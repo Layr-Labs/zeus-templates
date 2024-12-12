@@ -47,6 +47,7 @@ library ZEnvHelpers {
 
     string internal constant IMPL_SUFFIX = "_Impl";
     string internal constant PROXY_SUFFIX = "_Proxy";
+    string internal constant BEACON_SUFFIX = "_Beacon";
 
     bytes32 internal constant STATE_SLOT = keccak256("STATE_SLOT");
 
@@ -73,25 +74,15 @@ library ZEnvHelpers {
      * @return The address of the contract associated with the provided key. Reverts if envvar not found.
      */
     function deployedProxy(State storage s, string memory name) internal view returns (address) {
-        string memory lookupKey = string.concat(name, PROXY_SUFFIX);
+        return _getDeployed(s, name, PROXY_SUFFIX);
+    }
 
-        if (s.updatedContracts[lookupKey] != address(0)) {
-            return s.updatedContracts[lookupKey];
-        }
-
-        string memory envvar = string.concat(DEPLOYED_PREFIX, lookupKey);
-        return vm.envAddress(envvar);
+    function deployedBeacon(State storage s, string memory name) internal view returns (address) {
+        return _getDeployed(s, name, BEACON_SUFFIX);
     }
 
     function deployedImpl(State storage s, string memory name) internal view returns (address) {
-        string memory lookupKey = string.concat(name, IMPL_SUFFIX);
-
-        if (s.updatedContracts[lookupKey] != address(0)) {
-            return s.updatedContracts[lookupKey];
-        }
-
-        string memory envvar = string.concat(DEPLOYED_PREFIX, lookupKey);
-        return vm.envAddress(envvar);
+        return _getDeployed(s, name, IMPL_SUFFIX);
     }
 
     // ZEUS_DEPLOYED_ + name + _$INDEX
@@ -277,6 +268,17 @@ library ZEnvHelpers {
     function clean(State storage s, string memory key) private {
         require(s._dirty[key] == Cleanliness.DIRTY, string.concat(key, ": key was unchanged."));
         s._dirty[key] = Cleanliness.UPTODATE;
+    }
+
+    function _getDeployed(State storage s, string memory name, string memory suffix) private view returns (address) {
+        string memory lookupKey = string.concat(name, suffix);
+
+        if (s.updatedContracts[lookupKey] != address(0)) {
+            return s.updatedContracts[lookupKey];
+        }
+
+        string memory envvar = string.concat(DEPLOYED_PREFIX, lookupKey);
+        return vm.envAddress(envvar);
     }
 
     modifier onlyTest() {
