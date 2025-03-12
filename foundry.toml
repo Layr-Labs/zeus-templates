@@ -5,4 +5,6 @@ libs = ["lib"]
 
 solc_version = '0.8.12'
 
+allow_internal_expect_revert = true
+
 # See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options
