@@ -59,6 +59,20 @@ library ZEnvHelpers {
     }
 
     /**
+     * If an upgrade is in progress, this represents the semver of the environment at the time the upgrade began.
+     */
+    function inProgressDeployFromSemver() internal view returns (string memory) {
+        return vm.envString("ZEUS_DEPLOY_FROM_VERSION");
+    }
+
+    /**
+     * If an upgrade is in progress, this represents the semver that the upgrade will upgrade to.
+     */
+    function inProgressDeployToSemver() internal view returns (string memory) {
+        return vm.envString("ZEUS_DEPLOY_TO_VERSION");
+    }
+
+    /**
      * NOTE: do not use this directly.
      *
      * please use deploySingleton / deployInstance from the EOADeployer.
