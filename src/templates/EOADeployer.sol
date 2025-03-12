@@ -50,6 +50,11 @@ abstract contract EOADeployer is ZeusScript {
         return deployedTo;
     }
 
+    function deployBeacon(string memory name, address deployedTo) internal returns (address) {
+        deploySingleton(deployedTo, name.beacon());
+        return deployedTo;
+    }
+
     function deployProxy(string memory name, address deployedTo) internal returns (address) {
         deploySingleton(deployedTo, name.proxy());
         return deployedTo;
