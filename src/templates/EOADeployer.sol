@@ -32,6 +32,7 @@ abstract contract EOADeployer is ZeusScript {
      * Emits via ZeusDeploy event.
      */
     function runAsEOA() public {
+        _mode = OperationalMode.EOA;
         _runAsEOA();
     }
 
@@ -40,33 +41,38 @@ abstract contract EOADeployer is ZeusScript {
      */
     function _runAsEOA() internal virtual;
 
-    function deployContract(string memory name, address deployedTo) internal returns (address) {
+    modifier onlyEOA() {
+        require(_mode == OperationalMode.EOA, "only EOA steps can deploy contracts.");
+        _;
+    }
+
+    function deployContract(string memory name, address deployedTo) internal onlyEOA returns (address) {
         deploySingleton(deployedTo, name);
         return deployedTo;
     }
 
-    function deployImpl(string memory name, address deployedTo) internal returns (address) {
+    function deployImpl(string memory name, address deployedTo) internal onlyEOA returns (address) {
         deploySingleton(deployedTo, name.impl());
         return deployedTo;
     }
 
-    function deployBeacon(string memory name, address deployedTo) internal returns (address) {
+    function deployBeacon(string memory name, address deployedTo) internal onlyEOA returns (address) {
         deploySingleton(deployedTo, name.beacon());
         return deployedTo;
     }
 
-    function deployProxy(string memory name, address deployedTo) internal returns (address) {
+    function deployProxy(string memory name, address deployedTo) internal onlyEOA returns (address) {
         deploySingleton(deployedTo, name.proxy());
         return deployedTo;
     }
 
-    function deploySingleton(address deployedTo, string memory name) internal {
+    function deploySingleton(address deployedTo, string memory name) internal onlyEOA {
         emit ZeusDeploy(name, deployedTo, true /* singleton */ );
         _deployments.push(Deployment(deployedTo, name, true));
         ZEnvHelpers.state().__updateContract(name, deployedTo);
     }
 
-    function deployInstance(address deployedTo, string memory name) internal {
+    function deployInstance(address deployedTo, string memory name) internal onlyEOA {
         emit ZeusDeploy(name, deployedTo, false /* singleton */ );
         _deployments.push(Deployment(deployedTo, name, false));
 
@@ -78,7 +84,7 @@ abstract contract EOADeployer is ZeusScript {
         state.__updateContract(env, deployedTo);
     }
 
-    function deploys() public view returns (Deployment[] memory) {
+    function deploys() public view onlyEOA returns (Deployment[] memory) {
         return _deployments;
     }
 }

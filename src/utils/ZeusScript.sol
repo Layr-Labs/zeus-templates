@@ -8,9 +8,14 @@ import {Script} from "forge-std/Script.sol";
 import {Test} from "forge-std/Test.sol";
 import {console} from "forge-std/console.sol";
 
+
 abstract contract ZeusScript is Script, Test {
     using StringUtils for string;
     using ZEnvHelpers for *;
+
+    enum OperationalMode {MULTISIG, EOA}
+
+    OperationalMode public _mode;
 
     struct MultisigOptions {
         address addr; // the address of the multisig

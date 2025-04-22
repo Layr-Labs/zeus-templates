@@ -17,9 +17,17 @@ abstract contract MultisigBuilder is ZeusScript {
     }
 
     /**
+     * Whether to issue a `Call` or `DelegateCall` with Gnosis.
+     */
+    function callType() public virtual returns (Encode.Operation) {
+        return Encode.Operation.Call;
+    }
+
+    /**
      * @notice Constructs a SafeTx object for a Gnosis Safe to ingest. Emits via `ZeusMultisigExecute`
      */
     function execute() public {
+        _mode = OperationalMode.MULTISIG;
         _runAsMultisig();
         require(hasPranked, "MultisigBuilder.execute: did not use prank helpers");
     }
@@ -36,7 +44,7 @@ abstract contract MultisigBuilder is ZeusScript {
         require(!hasPranked, "MultisigBuilder._startPrank: called twice in txn");
         hasPranked = true;
 
-        emit ZeusRequireMultisig(caller, Encode.Operation.Call);
+        emit ZeusRequireMultisig(caller, this.callType());
         vm.startPrank(caller);
     }
 

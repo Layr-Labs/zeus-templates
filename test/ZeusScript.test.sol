@@ -5,15 +5,17 @@ import {Test} from "forge-std/Test.sol";
 import {ZeusScript} from "../src/utils/ZeusScript.sol";
 import "../src/utils/Encode.sol";
 import {EOADeployer} from "../src/templates/EOADeployer.sol";
+import {MultisigBuilder} from "../src/templates/MultisigBuilder.sol";
 import "../src/utils/ZEnvHelpers.sol";
 import {StringUtils} from "../src/utils/StringUtils.sol";
 import {ScriptHelpers} from "../src/utils/ScriptHelpers.sol";
 
-contract ZeusScriptTest is EOADeployer {
+contract ZeusScriptTest is EOADeployer, MultisigBuilder {
     using ScriptHelpers for *;
     using ZEnvHelpers for *;
 
     function _runAsEOA() internal override {}
+    function _runAsMultisig() internal override {}
 
     function setUp() public {
         // Set some environment variables to test fallback logic with simple incremental addresses.
@@ -35,10 +37,20 @@ contract ZeusScriptTest is EOADeployer {
         vm.setEnv("ZEUS_TEST", "true");
     }
 
+    function testMultisigCantDeploy() public {
+        _mode = OperationalMode.MULTISIG;
+        vm.expectRevert();
+        deploySingleton(address(1000), "MyContract");
+
+        _mode = OperationalMode.EOA;
+        deploySingleton(address(1000), "MyContract");
+    }
+
     function testZAssert() public {
         State storage state = ZEnvHelpers.state();
 
         // simple deploys
+        _mode = OperationalMode.EOA;
         do {
             string[] memory contracts = new string[](2);
             contracts[0] = "MyContract".impl();
