@@ -1,16 +1,17 @@
 // SPDX-License-Identifier: BUSL-1.1
 pragma solidity ^0.8.12;
 
+import "../utils/ZEnvHelpers.sol";
 import "../utils/ZeusScript.sol";
+import {ScriptHelpers} from "../utils/ScriptHelpers.sol";
 
 /**
  * @title MultisigBuilder
  * @dev Abstract contract for building arbitrary multisig scripts.
  */
 abstract contract MultisigBuilder is ZeusScript {
-    using ScriptHelpers for *;
     using ZEnvHelpers for *;
-
+    using ScriptHelpers for *;
     bool private hasPranked;
 
     modifier prank(address caller) {
