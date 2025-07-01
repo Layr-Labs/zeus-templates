@@ -8,6 +8,9 @@ import "../utils/ZeusScript.sol";
  * @dev Abstract contract for building arbitrary multisig scripts.
  */
 abstract contract MultisigBuilder is ZeusScript {
+    using ScriptHelpers for *;
+    using ZEnvHelpers for *;
+
     bool private hasPranked;
 
     modifier prank(address caller) {
@@ -56,5 +59,21 @@ abstract contract MultisigBuilder is ZeusScript {
     /// @dev Only meant for use with tests. Please ensure you know what you are doing if you call this!
     function _unsafeResetHasPranked() internal {
         hasPranked = false;
+    }
+
+    /// @dev Only meant for use with deploying a contract from a multisig. Please ensure you know what you are doing if you call this!
+    function _unsafeAddProxyContract(string memory name, address deployedTo) internal {
+        _addContract(name.proxy(), deployedTo);
+    }
+
+    /// @dev Only meant for use with deploying a contract from a multisig. Please ensure you know what you are doing if you call this!
+    function _unsafeAddImplContract(string memory name, address deployedTo) internal {
+        _addContract(name.impl(), deployedTo);
+    }
+
+    /// @notice Adds a contract to the environment.
+    function _addContract(string memory name, address deployedTo) private {
+        emit ZeusDeploy(name, deployedTo, false /* singleton */ );
+        ZEnvHelpers.state().__updateContract(name, deployedTo);
     }
 }
