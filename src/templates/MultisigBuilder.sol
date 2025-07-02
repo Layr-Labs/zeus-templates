@@ -1,13 +1,18 @@
 // SPDX-License-Identifier: BUSL-1.1
 pragma solidity ^0.8.12;
 
+import "../utils/ZEnvHelpers.sol";
 import "../utils/ZeusScript.sol";
+import {ScriptHelpers} from "../utils/ScriptHelpers.sol";
 
 /**
  * @title MultisigBuilder
  * @dev Abstract contract for building arbitrary multisig scripts.
  */
 abstract contract MultisigBuilder is ZeusScript {
+    using ZEnvHelpers for *;
+    using ScriptHelpers for *;
+
     bool private hasPranked;
 
     modifier prank(address caller) {
@@ -56,5 +61,23 @@ abstract contract MultisigBuilder is ZeusScript {
     /// @dev Only meant for use with tests. Please ensure you know what you are doing if you call this!
     function _unsafeResetHasPranked() internal {
         hasPranked = false;
+    }
+
+    /// @dev Only meant for use with deploying a contract from a multisig. Please ensure you know what you are doing if you call this!
+    function _unsafeAddProxyContract(string memory name, address deployedTo) internal {
+        _addContract(name.proxy(), deployedTo);
+    }
+
+    /// @dev Only meant for use with deploying a contract from a multisig. Please ensure you know what you are doing if you call this!
+
+    function _unsafeAddImplContract(string memory name, address deployedTo) internal {
+        _addContract(name.impl(), deployedTo);
+    }
+
+    /// @notice Adds a contract to the environment.
+    /// @dev This function assumes that the contract is a singleton.
+    function _addContract(string memory name, address deployedTo) private {
+        emit ZeusDeploy(name, deployedTo, true /* singleton */ );
+        ZEnvHelpers.state().__updateContract(name, deployedTo);
     }
 }
