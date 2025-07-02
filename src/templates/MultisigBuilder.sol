@@ -74,7 +74,7 @@ abstract contract MultisigBuilder is ZeusScript {
 
     /// @notice Adds a contract to the environment.
     function _addContract(string memory name, address deployedTo) private {
-        emit ZeusDeploy(name, deployedTo, false /* singleton */ );
+        emit ZeusDeploy(name, deployedTo, true /* singleton */ );
         ZEnvHelpers.state().__updateContract(name, deployedTo);
     }
 }
