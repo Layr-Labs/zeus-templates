@@ -49,7 +49,7 @@ abstract contract MultisigBuilder is ZeusScript {
         require(!hasPranked, "MultisigBuilder._startPrank: called twice in txn");
         hasPranked = true;
 
-        emit ZeusRequireMultisig(caller, this.callType());
+        emit ZeusRequireMultisig(caller, callType());
         vm.startPrank(caller);
     }
 
