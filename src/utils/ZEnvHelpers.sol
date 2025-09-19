@@ -82,6 +82,10 @@ library ZEnvHelpers {
         s.updatedContracts[name] = deployedTo;
     }
 
+    function deployedContract(State storage s, string memory name) internal view returns (address) {
+        return _getDeployed(s, name, "");
+    }
+
     /**
      * @notice Returns the address of a proxy contract based on the provided key, querying the envvars injected by Zeus.
      * @param name The key to look up the address for. Should be the contract name, e.g. `type(DelegationManager).name`
